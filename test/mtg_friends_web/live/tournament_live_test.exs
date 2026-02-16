@@ -31,7 +31,7 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
     test "lists all tournaments", %{conn: conn, tournament: tournament} do
       {:ok, _index_live, html} = live(conn, ~p"/tournaments")
 
-      assert html =~ "Tournaments"
+      assert html =~ "Discover Your Next"
       assert html =~ tournament.location
     end
 
@@ -41,7 +41,7 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
 
       {:ok, index_live, _html} = live(conn, ~p"/tournaments")
 
-      index_live |> element("a", "Create new tournament") |> render_click()
+      index_live |> element("a", "Create Tournament") |> render_click()
 
       assert_patch(index_live, ~p"/tournaments/new")
     end

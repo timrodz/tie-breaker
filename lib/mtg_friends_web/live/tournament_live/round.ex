@@ -1,9 +1,9 @@
 defmodule MtgFriendsWeb.TournamentLive.Round do
   use MtgFriendsWeb, :live_view
 
-  alias MtgFriendsWeb.UserAuth
   alias MtgFriends.Rounds
   alias MtgFriends.Utils.Date
+  alias MtgFriendsWeb.UserAuth
 
   on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
 
@@ -69,9 +69,12 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       |> Map.new()
 
     round_finish_time =
-      case round.started_at do
-        nil -> nil
-        _ -> NaiveDateTime.add(round.started_at, round.tournament.round_length_minutes, :minute)
+      cond do
+        not is_nil(round.started_at) and round.status != :finished ->
+          NaiveDateTime.add(round.started_at, round.tournament.round_length_minutes, :minute)
+
+        true ->
+          nil
       end
 
     with timer_reference <- Map.get(socket.assigns, :timer_reference),

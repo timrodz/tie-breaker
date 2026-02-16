@@ -1,77 +1,263 @@
-<.header class="mb-4">
-  {@tournament_name}
-  <:subtitle>
-    Round #{@round_number + 1} / <.round_status value={@round_status} />
-  </:subtitle>
-</.header>
-
-<%= if @round_status == :active do %>
-  <section id="timer">
-    <.round_timer
-      seconds_left={@round_countdown_timer |> elem(0)}
-      time_left={@round_countdown_timer |> elem(1)}
-    />
-  </section>
-<% end %>
-<%= if @current_user_owner and @round_status == :inactive do %>
-  <div class="alert border-base-300 alert-vertical py-6">
-    <p>
-      🎉 This round's pods have been generated!<br />Let players know who they'll be playing against.
-    </p>
-    <p>When all players are ready, click on <b>Start round</b> below.</p>
-    <.button phx-click="start-round" phx-disable-with="Starting..." variant="primary">
-      <.icon name="hero-rocket-launch-solid" />Start round
-    </.button>
-  </div>
-<% end %>
-
-<section id="pairings">
-  <h2>Pairings</h2>
-  <.item_grid id="pairing" items={@pairings}>
-    <:item :let={{pairing, index}} class="justify-between">
-      <div>
-        <h3 class="font-semibold">
-          Pod #{index} — {(@round_status == :inactive && "Waiting for start") ||
-            (pairing.active && "In progress") ||
-            "Finished"}
-        </h3>
-        <div
-          :for={pp <- Enum.sort_by(pairing.pairing_participants, fn p -> p.points end, :desc)}
-          id={"tournament-#{@tournament_id}-round-#{@round_id}-pairing-#{pairing.id}-participant-#{pp.participant.id}"}
-          class={[
-            "flex justify-between items-center gap-2 py-1 px-2 rounded-md",
-            (pairing.winner_id == pp.participant_id && "font-bold bg-success text-success-content") ||
-              ""
-          ]}
+<div class="min-h-screen bg-[#020a15] text-slate-100 [background-image:radial-gradient(circle_at_2px_2px,rgba(59,130,246,0.17)_1px,transparent_0)] [background-size:26px_26px]">
+  <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
+    <nav class="mb-8">
+      <div class="inline-flex items-center gap-1 rounded-2xl border border-slate-700/80 bg-slate-900/60 p-1">
+        <.link
+          navigate={~p"/tournaments/#{@tournament_id}"}
+          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-slate-400 transition-colors hover:border-slate-700 hover:text-slate-200"
         >
-          <p class="flex gap-1 items-center">
-            {pp.participant.name}
-            <.icon :if={pairing.winner_id == pp.participant_id} name="hero-trophy" />
+          Event Overview
+        </.link>
+        <span class="rounded-xl border border-blue-500/80 bg-blue-500/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-blue-300">
+          Round Information
+        </span>
+      </div>
+    </nav>
+
+    <main class="flex flex-col gap-8 xl:flex-row">
+      <aside class="w-full xl:w-72">
+        <div class="space-y-4 xl:sticky xl:top-28">
+          <p class="px-3 text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">
+            Round History
           </p>
-          <p>
-            Points: {pp.points}
+
+          <.link
+            :for={round <- Enum.sort_by(@tournament_rounds, & &1.number, :desc)}
+            navigate={~p"/tournaments/#{@tournament_id}/rounds/#{round.number + 1}"}
+            class={[
+              "block w-full rounded-[2rem] border px-6 py-4 transition-all",
+              round.number == @round_number &&
+                "border-blue-500 bg-blue-500/15 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.25)]",
+              round.number != @round_number &&
+                "border-slate-700/70 bg-slate-900/65 text-slate-200 hover:border-blue-500/50"
+            ]}
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-2xl font-bold tracking-tight">Round {round.number + 1}</p>
+                <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                  {String.upcase(to_string(round.status))}
+                </p>
+              </div>
+              <.icon
+                name={
+                  if round.number == @round_number,
+                    do: "hero-radio-solid",
+                    else: "hero-clock-solid"
+                }
+                class={
+                  "size-4 #{if round.number == @round_number, do: "text-blue-400", else: "text-slate-500"}"
+                }
+              />
+            </div>
+          </.link>
+
+          <div class="rounded-2xl border border-blue-500/25 bg-[#031329]/85 p-6">
+            <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">
+              Event Stats
+            </p>
+            <div class="space-y-4">
+              <div class="flex items-end justify-between">
+                <span class="text-sm text-slate-400">Attendance</span>
+                <span class="text-2xl font-bold text-white">{length(@participants)}</span>
+              </div>
+              <div class="flex items-end justify-between">
+                <span class="text-sm text-slate-400">Pods</span>
+                <span class="text-2xl font-bold text-white">{length(@pairings)}</span>
+              </div>
+              <div class="flex items-end justify-between">
+                <span class="text-sm text-slate-400">Time Remaining</span>
+                <span class="text-2xl font-bold text-blue-400">
+                  {if @round_status == :active, do: elem(@round_countdown_timer, 1), else: "--:--"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="min-w-0 flex-1 space-y-8">
+        <div class="rounded-3xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 class="text-4xl font-black tracking-tight text-white">
+                Round {@round_number + 1} Pairings
+              </h2>
+              <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+                <span class="inline-flex items-center gap-1">
+                  <.icon name="hero-information-circle-solid" class="size-4" />
+                  {if @round_status == :active,
+                    do: "Live Updates Enabled",
+                    else: "Round Not Started"}
+                </span>
+                <span class="h-1 w-1 rounded-full bg-slate-600"></span>
+                <span class="inline-flex items-center gap-1">
+                  <.icon name="hero-squares-2x2-solid" class="size-4" /> {length(@pairings)} Tables
+                </span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+              <div class="rounded-full border border-slate-600 bg-slate-800/60 px-5 py-3 text-center">
+                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                  Pairing Logic
+                </p>
+                <p class="mt-1 text-xl font-bold text-blue-300">Swiss Pods</p>
+              </div>
+              <div class="rounded-full border border-slate-600 bg-slate-800/60 px-5 py-3 text-center">
+                <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                  Round Limit
+                </p>
+                <p class="mt-1 text-xl font-bold text-white">
+                  {if @round_finish_time, do: elem(@round_countdown_timer, 1), else: "--:--"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            :if={@current_user_owner and @round_status == :inactive}
+            class="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4"
+          >
+            <p class="mb-3 text-sm text-emerald-200">
+              This round's pods are generated and ready to start.
+            </p>
+            <button
+              type="button"
+              phx-click="start-round"
+              phx-disable-with="Starting..."
+              class="inline-flex items-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-emerald-100"
+            >
+              <.icon name="hero-rocket-launch-solid" class="size-4" /> Start Round
+            </button>
+          </div>
+
+          <div
+            :if={@current_user_owner and @round_status == :active}
+            class="mt-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
+          >
+            <p class="mb-3 text-sm text-amber-200">
+              All results in? Finish the round and lock standings.
+            </p>
+            <button
+              type="button"
+              phx-click="finish-round"
+              phx-disable-with="Finishing..."
+              class="inline-flex items-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-amber-100"
+            >
+              <.icon name="hero-flag-solid" class="size-4" /> Finish Round
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
+          <article
+            :for={{pairing, index} <- @pairings}
+            class={[
+              "rounded-[2.8rem] border p-6 transition-colors",
+              index <= 3 && "border-slate-600/70 bg-slate-900/75",
+              index > 3 && "border-slate-700/70 bg-slate-900/45"
+            ]}
+          >
+            <div class="mb-5 border-b border-slate-700/60 pb-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-5xl font-black tracking-tight text-blue-500/90">
+                    {index |> Integer.to_string() |> String.pad_leading(2, "0")}
+                  </p>
+                  <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                    Table
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                    Status
+                  </p>
+                  <p class={[
+                    "mt-1 inline-flex rounded-full px-2 py-1 text-xs font-bold",
+                    @round_status == :inactive && "bg-slate-700/70 text-slate-200",
+                    @round_status != :inactive && pairing.active &&
+                      "bg-amber-500/20 text-amber-300",
+                    @round_status != :inactive && not pairing.active &&
+                      "bg-emerald-500/20 text-emerald-300"
+                  ]}>
+                    {if @round_status == :inactive,
+                      do: "Waiting",
+                      else: if(pairing.active, do: "Playing", else: "Finished")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div
+                :for={
+                  pp <- Enum.sort_by(pairing.pairing_participants, fn p -> p.points end, :desc)
+                }
+                id={"tournament-#{@tournament_id}-round-#{@round_id}-pairing-#{pairing.id}-participant-#{pp.participant.id}"}
+                class={[
+                  "flex items-center justify-between rounded-2xl px-3 py-2",
+                  pairing.winner_id == pp.participant_id &&
+                    "border border-emerald-500/40 bg-emerald-500/15",
+                  pairing.winner_id != pp.participant_id && "text-slate-300"
+                ]}
+              >
+                <p class={[
+                  "text-2xl font-semibold tracking-tight",
+                  pairing.winner_id == pp.participant_id && "text-white",
+                  pairing.winner_id != pp.participant_id && "text-slate-300"
+                ]}>
+                  {pp.participant.name}
+                </p>
+                <p class={[
+                  "text-2xl font-black",
+                  pairing.winner_id == pp.participant_id && "text-emerald-300",
+                  pairing.winner_id != pp.participant_id && "text-slate-300"
+                ]}>
+                  {pp.points} pts
+                </p>
+              </div>
+            </div>
+
+            <.link
+              :if={@current_user_owner && @round_status != :inactive}
+              patch={
+                ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
+              }
+              phx-click={JS.push_focus()}
+              class="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-blue-200"
+            >
+              <.icon name="hero-pencil-square-solid" class="size-4" />
+              {if pairing.active, do: "Assign Pod Results", else: "Update Pod Results"}
+            </.link>
+          </article>
+        </div>
+
+        <div class="py-12 text-center">
+          <div class="mx-auto mb-4 h-px w-24 bg-slate-700"></div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+            End of round {@round_number + 1} list
           </p>
         </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="border-t border-slate-800 bg-[#040d19]/90 py-8">
+    <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500 md:flex-row lg:px-6">
+      <div class="flex items-center gap-8">
+        <span class="inline-flex items-center gap-2 text-emerald-400">
+          <span class="size-2 rounded-full bg-emerald-500"></span> System: Operational
+        </span>
+        <span>Version: 2.5.0-live</span>
       </div>
-      <div>
-        <.link
-          :if={@current_user_owner && @round_status != :inactive}
-          patch={
-            ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
-          }
-          phx-click={JS.push_focus()}
-          class={["self-start btn", if(pairing.active, do: "btn-primary", else: "btn-secondary")]}
-        >
-          <%= if pairing.active do %>
-            Assign pod results
-          <% else %>
-            Update pod results
-          <% end %>
-        </.link>
+      <div class="inline-flex items-center gap-2 text-slate-400">
+        Powered by Tie Breaker Engine
+        <.icon name="hero-bolt-solid" class="size-3.5 text-blue-400" />
       </div>
-    </:item>
-  </.item_grid>
-</section>
+    </div>
+  </footer>
+</div>
 
 <.modal
   :if={@live_action == :edit}
@@ -91,5 +277,3 @@
     navigate={~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}"}
   />
 </.modal>
-
-<.back navigate={~p"/tournaments/#{@tournament_id}"}>Tournament</.back>

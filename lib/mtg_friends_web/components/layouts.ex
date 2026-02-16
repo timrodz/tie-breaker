@@ -6,88 +6,76 @@ defmodule MtgFriendsWeb.Layouts do
   @spec app(any()) :: Phoenix.LiveView.Rendered.t()
   def app(assigns) do
     ~H"""
-    <div class="navbar bg-base-100 border-base-300 border-b-[1px] px-4 lg:px-10">
-      <div class="navbar-start">
+    <nav class="sticky top-0 z-50 border-b border-slate-800/70 bg-[#101822]/95 px-4 py-4 backdrop-blur-md lg:px-6">
+      <div class="mx-auto flex w-full max-w-[1800px] items-center justify-between">
         <.link
-          navigate={
-            case is_nil(@current_user) do
-              true -> ~p"/"
-              false -> ~p"/tournaments"
-            end
-          }
-          target={if is_nil(@current_user), do: "_blank", else: ""}
+          navigate={if(is_nil(@current_user), do: ~p"/", else: ~p"/tournaments")}
+          class="flex items-center gap-3"
         >
-          <span class="text-lg md:text-2xl text-primary font-bold">
-            ⚔ Tie Breaker
-          </span>
-        </.link>
-      </div>
-      <div class="navbar-end">
-        <div class="dropdown dropdown-left">
-          <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-            <.icon name="hero-bars-3-solid" />
+          <div class="flex size-10 items-center justify-center rounded-xl bg-blue-500">
+            <.icon name="hero-bolt-solid" class="size-5 text-white" />
           </div>
-          <ul
-            tabindex="0"
-            class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 card card-border space-y-1"
+          <span class="text-2xl font-black tracking-tight text-white">TIE BREAKER</span>
+        </.link>
+
+        <div class="flex items-center gap-3">
+          <.link
+            navigate={~p"/tournaments"}
+            class="hidden text-xs font-bold uppercase tracking-[0.2em] text-slate-300 transition-colors hover:text-white md:inline"
           >
-            <li>
-              <.link navigate={~p"/"}>
-                <.icon name="hero-home-solid" /> Home
+            Tournaments
+          </.link>
+
+          <details class="relative">
+            <summary class="flex size-10 list-none cursor-pointer items-center justify-center rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-300 transition-colors hover:bg-blue-500/20">
+              <.icon name="hero-bars-3-solid" class="size-5" />
+            </summary>
+
+            <div class="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-slate-700 bg-slate-900/95 p-2 shadow-xl">
+              <.link
+                navigate={~p"/tournaments"}
+                class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+              >
+                Tournaments
               </.link>
-            </li>
-            <li>
-              <.link navigate={~p"/tournaments"}>
-                <.icon name="hero-rocket-launch-solid" /> Tournaments
-              </.link>
-            </li>
-            <%= if @current_user do %>
-              <li>
-                <.link navigate={~p"/users/settings"}>
-                  <.icon name="hero-cog-6-tooth-solid" /> Settings
+
+              <%= if @current_user do %>
+                <.link
+                  navigate={~p"/users/settings"}
+                  class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                >
+                  Settings
                 </.link>
-              </li>
-              <li>
                 <.link
                   href={~p"/users/log_out"}
                   method="delete"
+                  class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
                 >
-                  <.icon name="hero-arrow-right-start-on-rectangle-solid" /> Log out
+                  Log out
                 </.link>
-              </li>
-            <% else %>
-              <li>
-                <.link navigate={~p"/users/register"}>
-                  Register
-                </.link>
-              </li>
-              <li>
-                <.link navigate={~p"/users/log_in"}>
+              <% else %>
+                <.link
+                  navigate={~p"/users/log_in"}
+                  class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                >
                   Log in
                 </.link>
-              </li>
-            <% end %>
-          </ul>
+                <.link
+                  navigate={~p"/users/register"}
+                  class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                >
+                  Register
+                </.link>
+              <% end %>
+            </div>
+          </details>
         </div>
       </div>
-    </div>
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {@inner_content}
-      </div>
-    </main>
+    </nav>
 
-    <footer class="footer sm:footer-horizontal footer-center bg-base-100 border-base-300 border-t-[1px] text-base-content p-4 bottom-0">
-      <aside>
-        <p>
-          Copyright © {DateTime.utc_now().year} —
-          <.link navigate="https://timrodz.dev" target="_blank" class="link link-hover">
-            Juan Morais
-          </.link>
-        </p>
-        <.theme_toggle />
-      </aside>
-    </footer>
+    <main>
+      {@inner_content}
+    </main>
 
     <.flash_group flash={@flash} />
     """

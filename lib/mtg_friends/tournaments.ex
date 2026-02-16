@@ -87,6 +87,61 @@ defmodule MtgFriends.Tournaments do
     Repo.aggregate(Tournament, :count, :id)
   end
 
+  @doc """
+  Lists tournaments with optional filters for name search, format, and status.
+  Supports pagination via `limit` and `page` params.
+
+  ## Params
+    * `"search"` - partial name match (case-insensitive)
+    * `"format"` - filter by format atom (e.g. "edh", "standard")
+    * `"status"` - filter by status atom (e.g. "active", "inactive", "finished")
+    * `"limit"` - results per page (default 6)
+    * `"page"` - page number (default 1)
+  """
+  @spec list_tournaments_filtered(map()) :: [Tournament.t()]
+  def list_tournaments_filtered(params \\ %{}) do
+    limit = Map.get(params, "limit", 6)
+    page = Map.get(params, "page", 1)
+    offset = limit * (page - 1)
+
+    Tournament
+    |> filter_by_name(params)
+    |> filter_by_format(params)
+    |> filter_by_status(params)
+    |> order_by([t], desc: t.date)
+    |> limit(^limit)
+    |> offset(^offset)
+    |> preload(:game)
+    |> Repo.all()
+  end
+
+  @spec count_tournaments_filtered(map()) :: integer()
+  def count_tournaments_filtered(params \\ %{}) do
+    Tournament
+    |> filter_by_name(params)
+    |> filter_by_format(params)
+    |> filter_by_status(params)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  defp filter_by_name(query, %{"search" => search}) when is_binary(search) and search != "" do
+    where(query, [t], ilike(t.name, ^"%#{search}%"))
+  end
+
+  defp filter_by_name(query, _params), do: query
+
+  defp filter_by_format(query, %{"format" => format}) when format != "" do
+    where(query, [t], t.format == ^format)
+  end
+
+  defp filter_by_format(query, _params), do: query
+
+  defp filter_by_status(query, %{"status" => status}) when status != "" do
+    where(query, [t], t.status == ^status)
+  end
+
+  defp filter_by_status(query, _params), do: query
+
   @spec list_tournaments_admin() :: [Tournament.t()]
   def list_tournaments_admin() do
     Repo.all(Tournament, order_by: [asc: :id])
