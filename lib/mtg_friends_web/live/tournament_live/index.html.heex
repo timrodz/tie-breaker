@@ -21,7 +21,7 @@
       <.icon name="hero-map-pin-solid" /> {t.location}
     </h4>
     <.tournament_status value={t.status} />
-    <.button href={~p"/tournaments/#{t.id}"}>
+    <.button navigate={~p"/tournaments/#{t.id}"}>
       <.icon name="hero-globe-alt" /> View tournament
     </.button>
   </:item>
@@ -48,7 +48,7 @@
   :if={@live_action in [:new, :edit]}
   id="tournament-modal"
   show
-  on_cancel={JS.navigate(~p"/tournaments")}
+  on_cancel={JS.patch(~p"/tournaments")}
 >
   <.live_component
     module={MtgFriendsWeb.TournamentLive.TournamentEditFormComponent}

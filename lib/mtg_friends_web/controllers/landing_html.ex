@@ -12,7 +12,7 @@ defmodule MtgFriendsWeb.LandingHTML do
           <p class="md:text-lg py-6 text-base-content/80">
             Tie Breaker lets tournament organizers host their events, including Magic: The Gathering Commander nights.
           </p>
-          <.button variant="primary" href={~p"/tournaments/new"}>Host a tournament</.button>
+          <.button variant="primary" navigate={~p"/tournaments/new"}>Host a tournament</.button>
           <.button href="#about">Learn more</.button>
         </div>
       </div>
@@ -38,7 +38,7 @@ defmodule MtgFriendsWeb.LandingHTML do
       </.item_grid>
 
       <div class="inline-block">
-        <.button href={~p"/tournaments"} variant="accent-soft">
+        <.button navigate={~p"/tournaments"} variant="accent-soft">
           <.icon name="hero-chevron-right" /> See all tournaments
         </.button>
       </div>

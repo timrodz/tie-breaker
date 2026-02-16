@@ -168,7 +168,7 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
     %{tournament_id: tournament_id, round_number: round_number} = socket.assigns
 
     socket
-    |> push_navigate(
+    |> push_patch(
       to: ~p"/tournaments/#{tournament_id}/rounds/#{round_number + 1}",
       replace: true
     )

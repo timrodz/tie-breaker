@@ -60,7 +60,7 @@
             ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
           }
           phx-click={JS.push_focus()}
-          class="self-start btn btn-primary"
+          class={["self-start btn", if(pairing.active, do: "btn-primary", else: "btn-secondary")]}
         >
           <%= if pairing.active do %>
             Assign pod results
