@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-[#020a15] text-slate-100 [background-image:radial-gradient(circle_at_2px_2px,rgba(59,130,246,0.17)_1px,transparent_0)] [background-size:26px_26px]">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
-      <div class="inline-flex items-center gap-1 rounded-2xl border border-slate-700/80 bg-slate-900/60 p-1">
+      <div class="inline-flex items-center gap-1 rounded-xl border border-slate-700/80 bg-slate-900/60 p-1">
         <.link
           navigate={~p"/tournaments/#{@tournament.id}"}
           class="rounded-xl border border-blue-500/80 bg-blue-500/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-blue-300"
@@ -28,7 +28,7 @@
       <aside class="w-full xl:w-72">
         <div class="space-y-4 xl:sticky xl:top-28">
           <div class="rounded-2xl border border-blue-500/25 bg-[#031329]/85 p-6">
-            <p class="mb-4 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400">
+            <p class="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
               Event Stats
             </p>
             <div class="space-y-4">
@@ -38,12 +38,13 @@
                   {length(@tournament.participants)}
                 </span>
               </div>
-              <div class="flex items-end justify-between">
+              <div :if={@tournament.is_top_cut_4} class="flex items-end justify-between">
                 <span class="text-sm text-slate-400">Cut to Top</span>
                 <span class="text-2xl font-bold text-white">
-                  {if @tournament.is_top_cut_4, do: 4, else: 8}
+                  4
                 </span>
               </div>
+
               <div class="flex items-end justify-between">
                 <span class="text-sm text-slate-400">Tournament Status</span>
                 <span class="text-lg font-bold text-blue-400">
@@ -56,7 +57,7 @@
       </aside>
 
       <section class="min-w-0 flex-1 space-y-8">
-        <div class="rounded-3xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
+        <div class="rounded-2xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
           <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 class="text-4xl font-black tracking-tight text-white">Tournament Overview</h2>
@@ -64,13 +65,13 @@
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-map-pin-solid" class="size-4" /> {@tournament.location}
                 </span>
-                <span class="h-1 w-1 rounded-full bg-slate-600"></span>
+                <span class="h-1 w-1 rounded-2xl bg-slate-600"></span>
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-users-solid" class="size-4" /> {length(
                     @tournament.participants
                   )} Players
                 </span>
-                <span class="h-1 w-1 rounded-full bg-slate-600"></span>
+                <span class="h-1 w-1 rounded-2xl bg-slate-600"></span>
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-calendar-solid" class="size-4" /> {@tournament.date}
                 </span>
@@ -120,7 +121,7 @@
         </div>
 
         <div class="grid grid-cols-1 gap-6">
-          <div class="rounded-3xl border border-slate-700/70 bg-slate-900/70 p-6">
+          <div class="rounded-2xl border border-slate-700/70 bg-slate-900/70 p-6">
             <h3 class="mb-5 text-2xl font-black tracking-tight text-white">
               Participants & Standings
             </h3>
@@ -139,7 +140,7 @@
                   not p["is_dropped"] && "border-slate-700/60 bg-slate-950/60"
                 ]}
               >
-                <div class="mb-3 flex items-center justify-between">
+                <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
                     <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-slate-800 px-2 py-1 text-xs font-bold text-slate-300">
                       #{index + 1}
@@ -160,7 +161,7 @@
                   class="grid grid-cols-1 gap-3 md:grid-cols-2"
                 >
                   <label class="space-y-1">
-                    <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
                       Name
                     </span>
                     <input
@@ -173,7 +174,7 @@
                   </label>
 
                   <label class="space-y-1">
-                    <span class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
                       Decklist
                     </span>
                     <input
@@ -229,21 +230,6 @@
       </section>
     </main>
   </div>
-
-  <footer class="border-t border-slate-800 bg-[#040d19]/90 py-8">
-    <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500 md:flex-row lg:px-6">
-      <div class="flex items-center gap-8">
-        <span class="inline-flex items-center gap-2 text-emerald-400">
-          <span class="size-2 rounded-full bg-emerald-500"></span> System: Operational
-        </span>
-        <span>Version: 2.5.0-live</span>
-      </div>
-      <div class="inline-flex items-center gap-2 text-slate-400">
-        Powered by Tie Breaker Engine
-        <.icon name="hero-bolt-solid" class="size-3.5 text-blue-400" />
-      </div>
-    </div>
-  </footer>
 </div>
 
 <.modal

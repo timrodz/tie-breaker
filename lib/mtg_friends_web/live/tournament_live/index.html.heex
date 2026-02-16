@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-[#020a15] text-slate-100 [background-image:radial-gradient(circle_at_2px_2px,rgba(59,130,246,0.17)_1px,transparent_0)] [background-size:26px_26px]">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
-    <section class="mb-8 rounded-3xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
+    <section class="mb-8 rounded-2xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
       <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h1 class="text-4xl font-black tracking-tight text-white">All Tournaments</h1>
@@ -33,7 +33,7 @@
         class="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-12"
       >
         <label class="lg:col-span-7">
-          <span class="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
             Search
           </span>
           <span class="flex items-center rounded-xl border border-slate-700 bg-slate-900/80 px-3">
@@ -52,7 +52,7 @@
         </label>
 
         <label class="lg:col-span-2">
-          <span class="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
             Format
           </span>
           <select
@@ -67,7 +67,7 @@
         </label>
 
         <label class="lg:col-span-3">
-          <span class="mb-1 block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
             Status
           </span>
           <select
@@ -100,12 +100,12 @@
         <article
           :for={{dom_id, t} <- @streams.tournaments}
           id={dom_id}
-          class="group rounded-3xl border border-slate-700/70 bg-slate-900/75 p-5 transition-colors hover:border-blue-500/50"
+          class="group rounded-2xl border border-slate-700/70 bg-slate-900/75 p-5 transition-colors hover:border-blue-500/50"
         >
           <div class="mb-5 flex items-center justify-between border-b border-slate-700/60 pb-4">
             <p class="line-clamp-1 text-xl font-bold tracking-tight text-white">{t.name}</p>
             <span class={[
-              "rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]",
+              "rounded-2xl px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em]",
               t.status == :active &&
                 "border border-emerald-500/40 bg-emerald-500/20 text-emerald-300",
               t.status == :inactive && "border border-blue-500/40 bg-blue-500/20 text-blue-300",
@@ -178,21 +178,6 @@
       </div>
     </div>
   </div>
-
-  <footer class="border-t border-slate-800 bg-[#040d19]/90 py-8">
-    <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-500 md:flex-row lg:px-6">
-      <div class="flex items-center gap-8">
-        <span class="inline-flex items-center gap-2 text-emerald-400">
-          <span class="size-2 rounded-full bg-emerald-500"></span> System: Operational
-        </span>
-        <span>Version: 2.5.0-live</span>
-      </div>
-      <div class="inline-flex items-center gap-2 text-slate-400">
-        Powered by Tie Breaker Engine
-        <.icon name="hero-bolt-solid" class="size-3.5 text-blue-400" />
-      </div>
-    </div>
-  </footer>
 </div>
 
 <.modal
