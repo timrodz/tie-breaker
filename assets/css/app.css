@@ -96,7 +96,7 @@
 @custom-variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
 
-.nav-link {
+/*.nav-link {
     @apply text-[0.8125rem] leading-6 font-semibold text-base-content hover:text-secondary-content;
 }
 
@@ -134,4 +134,4 @@ select {
 
 select option {
     @apply hover:cursor-pointer;
-}
+}*/

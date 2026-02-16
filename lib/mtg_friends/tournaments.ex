@@ -30,6 +30,20 @@ defmodule MtgFriends.Tournaments do
     from(t in Tournament, order_by: [desc: :date], limit: ^limit, preload: [:game]) |> Repo.all()
   end
 
+  @spec list_live_tournaments(integer()) :: [Tournament.t()]
+  def list_live_tournaments(limit \\ 4) do
+    from(t in Tournament,
+      where: t.status == :active,
+      order_by: [desc: t.updated_at],
+      limit: ^limit,
+      preload: [
+        participants: ^from(p in Participant, order_by: [asc: p.id]),
+        rounds: ^from(r in Round, order_by: [asc: r.number])
+      ]
+    )
+    |> Repo.all()
+  end
+
   @doc """
   Returns the list of tournaments.
 
