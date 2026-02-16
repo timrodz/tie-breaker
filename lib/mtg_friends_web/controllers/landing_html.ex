@@ -10,7 +10,7 @@ defmodule MtgFriendsWeb.LandingHTML do
         <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3.5">
           <div class="flex items-center gap-3">
             <div class="flex size-10 items-center justify-center rounded-lg bg-blue-500">
-              <.icon name="hero-trophy-solid" class="size-5 text-white" />
+              <.icon name="hero-bolt-solid" class="size-5 text-white" />
             </div>
             <span class="text-2xl font-bold tracking-tight text-white">TIE BREAKER</span>
           </div>
@@ -58,7 +58,7 @@ defmodule MtgFriendsWeb.LandingHTML do
         <section class="mx-auto mt-24 max-w-7xl px-6">
           <div class="mb-6 flex items-end justify-between gap-4">
             <div>
-              <h2 class="text-5xl font-bold text-white">Live Events</h2>
+              <h2 class="text-5xl font-bold text-white">Latest tournaments</h2>
               <p class="mt-2 text-2xl text-slate-400">
                 Watch the top tournaments unfold in real-time.
               </p>
@@ -67,10 +67,11 @@ defmodule MtgFriendsWeb.LandingHTML do
               navigate={~p"/tournaments"}
               class="hidden items-center gap-1 text-sm font-bold uppercase tracking-wider text-blue-500 hover:text-blue-400 md:flex"
             >
-              View All Live <.icon name="hero-arrow-top-right-on-square-solid" class="size-4" />
+              View All Tournaments
+              <.icon name="hero-arrow-top-right-on-square-solid" class="size-4" />
             </.link>
           </div>
-          <.live_events />
+          <.live_tournaments />
         </section>
 
         <section id="features" class="mx-auto mt-28 max-w-7xl px-6">
@@ -175,7 +176,7 @@ defmodule MtgFriendsWeb.LandingHTML do
 
   attr :tournaments, :list, default: nil
 
-  defp live_events(assigns) do
+  defp live_tournaments(assigns) do
     tournaments = assigns.tournaments || Tournaments.list_live_tournaments(4)
     assigns = assign(assigns, :tournaments, tournaments)
 
@@ -186,9 +187,6 @@ defmodule MtgFriendsWeb.LandingHTML do
         class="rounded-xl border border-slate-800 bg-slate-900/90 p-4"
       >
         <div class="mb-3 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-slate-500">
-          <span class="inline-flex items-center gap-1 rounded-md bg-blue-500/10 px-2 py-1 text-blue-400">
-            <span class="size-1.5 rounded-2xl bg-blue-500"></span> Live
-          </span>
           <span>{round_progress_text(tournament)}</span>
         </div>
         <h3 class="line-clamp-2 text-3xl font-bold text-white">{tournament.name}</h3>
@@ -201,16 +199,9 @@ defmodule MtgFriendsWeb.LandingHTML do
             navigate={~p"/tournaments/#{tournament}"}
             class="text-xs font-bold uppercase tracking-wider text-white hover:text-blue-400"
           >
-            Track Live
+            See more
           </.link>
         </div>
-      </article>
-
-      <article
-        :if={@tournaments == []}
-        class="rounded-xl border border-slate-800 bg-slate-900/90 p-6 text-slate-400 md:col-span-2 xl:col-span-4"
-      >
-        No active tournaments right now.
       </article>
     </div>
     """

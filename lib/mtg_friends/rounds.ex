@@ -93,7 +93,7 @@ defmodule MtgFriends.Rounds do
     Repo.get_by!(Round, tournament_id: tournament_id, number: number - 1)
     |> Repo.preload(
       tournament: [:participants, rounds: :pairings],
-      pairings: [pairing_participants: :participant]
+      pairings: {from(p in Pairing, order_by: [asc: p.id]), [pairing_participants: :participant]}
     )
   end
 

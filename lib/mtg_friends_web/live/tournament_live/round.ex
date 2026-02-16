@@ -2,6 +2,7 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
   use MtgFriendsWeb, :live_view
 
   alias MtgFriends.Rounds
+  alias MtgFriends.Tournaments
   alias MtgFriends.Utils.Date
   alias MtgFriendsWeb.UserAuth
 
@@ -41,17 +42,13 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
   defp generate_socket(socket, tournament_id, round_number, action) do
     round = Rounds.get_round_from_round_number_str!(tournament_id, round_number)
 
-    # Map pairings to a structure easier for the template
-    # We can use the list index as "Table Number" for display since we removed `number` column
-    pairings_with_index = Enum.with_index(round.pairings, 1)
-
     forms =
-      pairings_with_index
-      |> Enum.map(fn {pairing, index} ->
+      round.pairings
+      |> Enum.map(fn pairing ->
         {pairing.id,
          to_form(%{
            "pairing_id" => pairing.id,
-           "table_number" => index,
+           "table_number" => pairing.id,
            "winner_id" => pairing.winner_id,
            "participants" =>
              Enum.map(
@@ -99,9 +96,11 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       tournament_id: round.tournament.id,
       tournament_name: round.tournament.name,
       tournament_rounds: round.tournament.rounds,
+      tournament_status: round.tournament.status,
+      rounds_remaining: rounds_remaining(round.tournament),
+      can_start_new_round?: can_start_new_round?(round.tournament),
       participants: round.tournament.participants,
-      # passing list of {pairing, index}
-      pairings: pairings_with_index,
+      pairings: round.pairings,
       page_title:
         case action do
           :index ->
@@ -151,6 +150,31 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
      |> reload_page}
   end
 
+  @impl true
+  def handle_event("create-round", _, socket) do
+    tournament = Tournaments.get_tournament!(socket.assigns.tournament_id)
+
+    if can_start_new_round?(tournament) do
+      case Rounds.start_round(tournament) do
+        {:ok, round} ->
+          {:noreply,
+           socket
+           |> put_flash(:success, "Round #{round.number + 1} created successfully")
+           |> push_navigate(to: ~p"/tournaments/#{tournament.id}/rounds/#{round.number + 1}")}
+
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, reason)}
+      end
+    else
+      {:noreply,
+       put_flash(
+         socket,
+         :error,
+         "Cannot start a new round yet. Finish all existing rounds first."
+       )}
+    end
+  end
+
   defp get_countdown_timer(round_end_time) do
     case round_end_time do
       nil ->
@@ -175,5 +199,15 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       to: ~p"/tournaments/#{tournament_id}/rounds/#{round_number + 1}",
       replace: true
     )
+  end
+
+  defp rounds_remaining(tournament) do
+    max(tournament.round_count - length(tournament.rounds), 0)
+  end
+
+  defp can_start_new_round?(tournament) do
+    tournament.status != :finished and
+      rounds_remaining(tournament) > 0 and
+      Enum.all?(tournament.rounds, fn round -> round.status != :active end)
   end
 end

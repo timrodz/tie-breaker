@@ -17,9 +17,17 @@
     <main class="flex flex-col gap-8 xl:flex-row">
       <aside class="w-full xl:w-72">
         <div class="space-y-4 xl:sticky xl:top-28">
-          <p class="px-3 text-xs font-bold uppercase tracking-[0.28em] text-slate-500">
-            Round History
-          </p>
+          <button
+            :if={@current_user_owner and @can_start_new_round?}
+            id="start-new-round-button"
+            type="button"
+            phx-click="create-round"
+            disabled={!@can_start_new_round?}
+            phx-disable-with="Starting..."
+            class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-blue-100 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <.icon name="hero-plus-solid" class="size-4" /> Start New Round
+          </button>
           <.link
             :for={round <- Enum.sort_by(@tournament_rounds, & &1.number, :desc)}
             navigate={~p"/tournaments/#{@tournament_id}/rounds/#{round.number + 1}"}
@@ -41,29 +49,11 @@
               <.icon
                 name="hero-clock-solid"
                 class={
-                  "size-4 #{if round.number == @round_number, do: "text-blue-400", else: "text-slate-500"}"
-                }
+                            "size-4 #{if round.number == @round_number, do: "text-blue-400", else: "text-slate-500"}"
+                        }
               />
             </div>
           </.link>
-
-          <div class="rounded-2xl border border-blue-500/25 bg-[#031329]/85 p-6">
-            <p class="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
-              Round Stats
-            </p>
-            <div class="space-y-4">
-              <div class="flex items-end justify-between">
-                <span class="text-sm text-slate-400">Pods</span>
-                <span class="text-2xl font-bold text-white">{length(@pairings)}</span>
-              </div>
-              <div class="flex items-end justify-between">
-                <span class="text-sm text-slate-400">Time Remaining</span>
-                <span class="text-2xl font-bold text-blue-400">
-                  {if @round_status == :active, do: elem(@round_countdown_timer, 1), else: "--:--"}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </aside>
 
@@ -77,35 +67,32 @@
               <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-400">
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-information-circle-solid" class="size-4" />
-                  {if @round_status == :active,
-                    do: "Live Updates Enabled",
-                    else: "Round Not Started"}
+                  {case @round_status do
+                    :active -> "Active"
+                    :finished -> "Finished"
+                    _ -> "asd"
+                  end}
                 </span>
                 <span class="h-1 w-1 rounded-2xl bg-slate-600"></span>
                 <span class="inline-flex items-center gap-1">
-                  <.icon name="hero-squares-2x2-solid" class="size-4" /> {length(@pairings)} Tables
+                  <.icon name="hero-squares-2x2-solid" class="size-4" /> {length(@pairings)} Pods
                 </span>
               </div>
             </div>
-
-            <div class="flex flex-wrap gap-3">
-              <div class="rounded-2xl border border-slate-600 bg-slate-800/60 px-5 py-3 text-center">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
-                  Pairing Logic
-                </p>
-                <p class="mt-1 text-xl font-bold text-blue-300">Swiss Pods</p>
+            <div class="flex items-center gap-6 rounded-xl border border-slate-700/80 bg-slate-900/55 px-4 py-3">
+              <div class="text-right">
+                <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Pods</p>
+                <p class="text-2xl font-black text-white">{length(@pairings)}</p>
               </div>
-              <div class="rounded-2xl border border-slate-600 bg-slate-800/60 px-5 py-3 text-center">
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
-                  Round Limit
+              <div :if={@round_status == :active} class="h-8 w-px bg-slate-700"></div>
+              <div :if={@round_status == :active} class="text-right">
+                <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                  Time Remaining
                 </p>
-                <p class="mt-1 text-xl font-bold text-white">
-                  {if @round_finish_time, do: elem(@round_countdown_timer, 1), else: "--:--"}
-                </p>
+                <p class="text-2xl font-black text-blue-400">{elem(@round_countdown_timer, 1)}</p>
               </div>
             </div>
           </div>
-
           <div
             :if={@current_user_owner and @round_status == :inactive}
             class="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4"
@@ -122,39 +109,18 @@
               <.icon name="hero-rocket-launch-solid" class="size-4" /> Start Round
             </button>
           </div>
-
-          <div
-            :if={@current_user_owner and @round_status == :active}
-            class="mt-5 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
-          >
-            <p class="mb-3 text-sm text-amber-200">
-              All results in? Finish the round and lock standings.
-            </p>
-            <button
-              type="button"
-              phx-click="finish-round"
-              phx-disable-with="Finishing..."
-              class="inline-flex items-center gap-2 rounded-xl border border-amber-500/50 bg-amber-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-amber-100"
-            >
-              <.icon name="hero-flag-solid" class="size-4" /> Finish Round
-            </button>
-          </div>
         </div>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
           <article
-            :for={{pairing, index} <- @pairings}
-            class={[
-              "rounded-xl border p-6 transition-colors",
-              index <= 3 && "border-slate-600/70 bg-slate-900/75",
-              index > 3 && "border-slate-700/70 bg-slate-900/45"
-            ]}
+            :for={{pairing, pairing_index} <- @pairings |> Enum.with_index()}
+            class="rounded-xl border border-slate-700/70 bg-slate-900/45 p-6 transition-colors"
           >
             <div class="mb-5 border-b border-slate-700/60 pb-4">
               <div class="flex items-start justify-between">
                 <div>
                   <p class="text-5xl font-black tracking-tight text-blue-500/90">
-                    {index |> Integer.to_string() |> String.pad_leading(2, "0")}
+                    {(pairing_index + 1) |> Integer.to_string() |> String.pad_leading(2, "0")}
                   </p>
                   <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
                     Pod

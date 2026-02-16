@@ -22,12 +22,12 @@ defmodule MtgFriendsWeb.Layouts do
           </.link>
 
           <div class="flex items-center gap-3">
-            <.link
+            <%!-- <.link
               navigate={~p"/tournaments"}
               class="hidden text-xs font-bold uppercase tracking-[0.2em] text-slate-300 transition-colors hover:text-white md:inline"
             >
               Tournaments
-            </.link>
+            </.link> --%>
 
             <details class="relative">
               <summary class="flex size-10 list-none cursor-pointer items-center justify-center rounded-2xl border border-blue-500/40 bg-blue-500/10 text-blue-300 transition-colors hover:bg-blue-500/20">
@@ -81,7 +81,7 @@ defmodule MtgFriendsWeb.Layouts do
       </main>
 
       <footer class="border-t border-slate-800 bg-[#040d19]/90 py-4">
-        <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-md font-bold uppercase tracking-[0.22em] text-slate-500 md:flex-row lg:px-6">
+        <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-xs font-bold uppercase tracking-[0.22em] text-slate-500 md:flex-row lg:px-6">
           <div class="flex items-center gap-8">
             <span class="inline-flex items-center gap-2 text-emerald-400">
               <span class="size-2 rounded-2xl bg-emerald-500"></span> System: Operational

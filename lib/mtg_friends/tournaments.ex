@@ -32,8 +32,9 @@ defmodule MtgFriends.Tournaments do
 
   @spec list_live_tournaments(integer()) :: [Tournament.t()]
   def list_live_tournaments(limit \\ 4) do
+    # Not paginating at the moment because there aren't enough live tournaments to always show this
     from(t in Tournament,
-      where: t.status == :active,
+      # where: t.status == :active,
       order_by: [desc: t.updated_at],
       limit: ^limit,
       preload: [

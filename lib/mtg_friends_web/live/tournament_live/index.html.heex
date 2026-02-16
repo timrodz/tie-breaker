@@ -103,7 +103,9 @@
           class="group rounded-2xl border border-slate-700/70 bg-slate-900/75 p-5 transition-colors hover:border-blue-500/50"
         >
           <div class="mb-5 flex items-center justify-between border-b border-slate-700/60 pb-4">
-            <p class="line-clamp-1 text-xl font-bold tracking-tight text-white">{t.name}</p>
+            <p class="line-clamp-1 text-xl font-bold tracking-tight text-white capitalize">
+              {t.name}
+            </p>
             <span class={[
               "rounded-2xl px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em]",
               t.status == :active &&
@@ -111,7 +113,7 @@
               t.status == :inactive && "border border-blue-500/40 bg-blue-500/20 text-blue-300",
               t.status == :finished && "border border-slate-500/40 bg-slate-500/20 text-slate-300"
             ]}>
-              {to_string(t.status)}
+              {t.status}
             </span>
           </div>
 
@@ -120,7 +122,7 @@
               <.icon name="hero-map-pin-solid" class="size-4 text-slate-500" /> {t.location}
             </p>
             <p class="inline-flex items-center gap-2">
-              <.icon name="hero-calendar-solid" class="size-4 text-slate-500" /> {t.date}
+              <.date dt={t.date} />
             </p>
             <p class="inline-flex items-center gap-2">
               <.icon name="hero-puzzle-piece" class="size-4 text-slate-500" /> {t.game.name}
@@ -135,7 +137,7 @@
               navigate={~p"/tournaments/#{t.id}"}
               class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-300 hover:text-blue-200"
             >
-              View Event <.icon name="hero-arrow-right-solid" class="size-4" />
+              View tournament <.icon name="hero-arrow-right-solid" class="size-4" />
             </.link>
 
             <.link
