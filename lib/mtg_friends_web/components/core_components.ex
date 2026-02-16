@@ -444,13 +444,10 @@ defmodule MtgFriendsWeb.CoreComponents do
 
   def warning(assigns) do
     ~H"""
-    <p class={
-      [
-        # "mt-3 flex gap-3 text-sm leading-6 rounded-md p-2 font-medium bg-yellow-200 phx-no-feedback:hidden",
-        "alert alert-warning",
-        @class
-      ]
-    }>
+    <p class={[
+      "alert alert-warning",
+      @class
+    ]}>
       <.icon name="hero-exclamation-triangle" class="mt-0.5 flex-none" />
       {render_slot(@inner_block)}
     </p>
@@ -529,27 +526,27 @@ defmodule MtgFriendsWeb.CoreComponents do
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          class="relative divide-y divide-base-300 border-t border-base-300 text-sm leading-6 text-base-content/80"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-100">
+          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-base-200">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
               class={["relative p-0", @row_click && "hover:cursor-pointer"]}
             >
               <div class="block py-4 pr-6">
-                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-base-100 sm:rounded-l-xl" />
+                <span class={["relative", i == 0 && "font-semibold text-base-content"]}>
                   {render_slot(col, @row_item.(row))}
                 </span>
               </div>
             </td>
             <td :if={@action != []} class="relative w-14 p-0">
               <div class="whitespace-nowrap py-4 text-right text-sm font-medium">
-                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
+                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-base-100 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
-                  class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  class="relative ml-4 font-semibold leading-6 text-base-content hover:text-base-content/70"
                 >
                   {render_slot(action, @row_item.(row))}
                 </span>

@@ -29,10 +29,25 @@ let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
 });
 
+const cssVar = (name) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+const syncTopbarTheme = () => {
+  const primary = cssVar("--color-primary");
+  const baseContent = cssVar("--color-base-content");
+
+  topbar.config({
+    barColors: { 0: primary || "oklch(51% 0.262 276.966)" },
+    shadowColor:
+      baseContent || "color-mix(in oklch, var(--color-base-content) 30%, transparent)",
+  });
+};
+
 // Show progress bar on live navigation and form submits
-topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
+syncTopbarTheme();
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
+window.addEventListener("phx:set-theme", syncTopbarTheme);
 
 // connect if there are any LiveViews on the page
 liveSocket.connect();

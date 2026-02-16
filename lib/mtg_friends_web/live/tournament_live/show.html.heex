@@ -1,23 +1,23 @@
-<div class="min-h-screen bg-[#020a15] text-slate-100 [background-image:radial-gradient(circle_at_2px_2px,rgba(59,130,246,0.17)_1px,transparent_0)] [background-size:26px_26px]">
+<div class="min-h-screen tb-page-bg text-base-content">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
-      <div class="inline-flex items-center gap-1 rounded-xl border border-slate-700/80 bg-slate-900/60 p-1">
+      <div class="inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
         <.link
           navigate={~p"/tournaments/#{@tournament.id}"}
-          class="rounded-xl border border-blue-500/80 bg-blue-500/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-blue-300"
+          class="rounded-xl border border-primary/80 bg-primary/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-primary"
         >
           Event Overview
         </.link>
         <.link
           :if={@latest_round}
           navigate={~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}"}
-          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-slate-400 transition-colors hover:border-slate-700 hover:text-slate-200"
+          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content/85"
         >
           Round Information
         </.link>
         <span
           :if={is_nil(@latest_round)}
-          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-slate-600"
+          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-base-content/50"
         >
           Round Information
         </span>
@@ -27,44 +27,44 @@
     <main class="flex flex-col gap-8 xl:flex-row">
       <aside class="w-full xl:w-72">
         <div class="space-y-4 xl:sticky xl:top-28">
-          <div class="rounded-2xl border border-blue-500/25 bg-[#031329]/85 p-6">
-            <p class="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-slate-400">
+          <div class="rounded-2xl border border-primary/25 tb-panel-strong p-6">
+            <p class="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-base-content/70">
               Event Stats
             </p>
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-400">Tournament Status</span>
-                <span class="text-lg font-bold text-blue-400">
+                <span class="text-sm text-base-content/70">Tournament Status</span>
+                <span class="text-lg font-bold text-primary">
                   {String.upcase(to_string(@tournament.status))}
                 </span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-400">Attendance</span>
-                <span class="text-2xl font-bold text-white">
+                <span class="text-sm text-base-content/70">Attendance</span>
+                <span class="text-2xl font-bold text-base-content">
                   {length(@tournament.participants)}
                 </span>
               </div>
               <div :if={@tournament.is_top_cut_4} class="flex items-center justify-between">
-                <span class="text-sm text-slate-400">Cut to Top</span>
-                <span class="text-2xl font-bold text-white">
+                <span class="text-sm text-base-content/70">Cut to Top</span>
+                <span class="text-2xl font-bold text-base-content">
                   4
                 </span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-400">Game</span>
-                <span class="text-lg font-bold text-white">
+                <span class="text-sm text-base-content/70">Game</span>
+                <span class="text-lg font-bold text-base-content">
                   {@tournament.game.name}
                 </span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-400">Format</span>
-                <span class="text-lg font-bold text-white">
+                <span class="text-sm text-base-content/70">Format</span>
+                <span class="text-lg font-bold text-base-content">
                   {to_string(@tournament.format) |> String.upcase()}
                 </span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-400">Subformat</span>
-                <span class="text-lg font-bold text-white">
+                <span class="text-sm text-base-content/70">Subformat</span>
+                <span class="text-lg font-bold text-base-content">
                   {@tournament.subformat
                   |> to_string()
                   |> String.replace("_", " ")
@@ -76,16 +76,16 @@
         </div>
       </aside>
       <section class="min-w-0 flex-1 space-y-8">
-        <div class="rounded-2xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
+        <div class="tb-panel-strong rounded-2xl p-6 lg:p-8">
           <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h1 class="text-4xl font-black text-white">Tournament Overview</h1>
-              <h2 class="text-2xl font-bold text-white capitalize">{@tournament.name}</h2>
-              <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+              <h1 class="text-4xl font-black text-base-content">Tournament Overview</h1>
+              <h2 class="text-2xl font-bold text-base-content capitalize">{@tournament.name}</h2>
+              <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-base-content/70">
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-map-pin-solid" class="size-4" /> {@tournament.location}
                 </span>
-                <span class="h-1 w-1 rounded-2xl bg-slate-600"></span>
+                <span class="h-1 w-1 rounded-2xl bg-base-content/40"></span>
                 <span class="inline-flex items-center gap-1">
                   <.date dt={@tournament.date} />
                 </span>
@@ -96,7 +96,7 @@
                 :if={@current_user_owner or @current_user_admin}
                 patch={~p"/tournaments/#{@tournament}/show/edit"}
                 phx-click={JS.push_focus()}
-                class="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800/60 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-slate-200 transition-colors hover:border-blue-500/50"
+                class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/60 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-base-content/85 transition-colors hover:border-primary/50"
               >
                 <.icon name="hero-adjustments-horizontal-solid" class="size-4" /> Edit
               </.link>
@@ -108,7 +108,7 @@
                   not @all_participants_have_names? or @is_current_round_active? or
                     not @has_enough_participants?
                 }
-                class="inline-flex items-center gap-2 rounded-xl border border-blue-500 bg-blue-500/20 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-blue-200 transition-colors hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-40"
+                class="inline-flex items-center gap-2 rounded-xl border border-primary bg-primary/20 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-primary-content transition-colors hover:bg-primary/30 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <.icon name="hero-plus-solid" class="size-4" />
                 {if length(@rounds) == 0, do: "Start Tournament", else: "Begin New Round"}
@@ -116,7 +116,7 @@
               <.link
                 :if={@latest_round}
                 navigate={~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}"}
-                class="inline-flex items-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/10 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-blue-200 transition-colors hover:bg-blue-500/20"
+                class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-primary-content transition-colors hover:bg-primary/20"
               >
                 <.icon name="hero-arrow-right-solid" class="size-4" /> Go To Round Information
               </.link>
@@ -124,14 +124,14 @@
           </div>
           <div
             :if={@tournament.description_html not in [nil, ""]}
-            class="mt-4 max-w-4xl text-md leading-7 text-slate-300"
+            class="mt-4 max-w-4xl text-md leading-7 text-base-content/80"
           >
             {raw(@tournament.description_html)}
           </div>
         </div>
         <div class="grid grid-cols-1 gap-6">
-          <div class="rounded-2xl border border-slate-700/70 bg-slate-900/70 p-6">
-            <h3 class="mb-5 text-2xl font-black tracking-tight text-white">
+          <div class="rounded-2xl border border-base-300/70 bg-base-200/70 p-6">
+            <h3 class="mb-5 text-2xl font-black tracking-tight text-base-content">
               Participants & Standings
             </h3>
             <.simple_form
@@ -144,20 +144,20 @@
                 id={"form-participant-#{p["id"]}"}
                 class={[
                   "rounded-2xl border p-4",
-                  p["is_dropped"] && "border-red-500/30 bg-red-500/10",
-                  not p["is_dropped"] && "border-slate-700/60 bg-slate-950/60"
+                  p["is_dropped"] && "border-error/30 bg-error/10",
+                  not p["is_dropped"] && "border-base-300/60 bg-base-300/60"
                 ]}
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-slate-800 px-2 py-1 text-xs font-bold text-slate-300">
+                    <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-base-200 px-2 py-1 text-xs font-bold text-base-content/80">
                       #{index + 1}
                     </span>
-                    <p class="text-lg font-bold text-white">
+                    <p class="text-lg font-bold text-base-content">
                       {p["name"] || "Unnamed Participant"}
                     </p>
                   </div>
-                  <p class="text-right text-sm font-semibold text-blue-300">
+                  <p class="text-right text-sm font-semibold text-primary">
                     {(p["scores"] && Decimal.round(p["scores"].total_score, 2)) || 0} pts
                   </p>
                 </div>
@@ -169,27 +169,27 @@
                   class="grid grid-cols-1 gap-3 md:grid-cols-2"
                 >
                   <label class="space-y-1">
-                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
                       Name
                     </span>
                     <input
                       type="text"
                       name={"form-participant-name-#{p["id"]}"}
                       value={p["name"]}
-                      class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none ring-0 transition-colors focus:border-blue-500"
+                      class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
                       placeholder="Participant name"
                     />
                   </label>
 
                   <label class="space-y-1">
-                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
                       Decklist
                     </span>
                     <input
                       type="url"
                       name={"form-participant-decklist-#{p["id"]}"}
                       value={p["decklist"]}
-                      class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none ring-0 transition-colors focus:border-blue-500"
+                      class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
                       placeholder="Decklist URL"
                     />
                   </label>
@@ -205,7 +205,7 @@
                       |> hide("##{p["id"]}")
                     }
                     data-confirm={"Are you sure? You're about to remove #{p["name"]} from the tournament."}
-                    class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-red-300 hover:text-red-200"
+                    class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-error hover:text-error-content"
                   >
                     <.icon name="hero-trash-solid" class="size-4" /> Remove
                   </.link>
@@ -216,7 +216,7 @@
                 <button
                   type="submit"
                   phx-disable-with="Saving..."
-                  class="inline-flex items-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-emerald-200"
+                  class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-success-content"
                 >
                   <.icon name="hero-check-solid" class="size-4" /> Save Changes
                 </button>
@@ -227,7 +227,7 @@
                   type="button"
                   phx-click="create-participant"
                   phx-disable-with="Creating..."
-                  class="inline-flex items-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-blue-200"
+                  class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-primary-content"
                 >
                   <.icon name="hero-user-plus-solid" class="size-4" /> Add Participant
                 </button>

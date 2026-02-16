@@ -1,26 +1,26 @@
-<div class="min-h-screen bg-[#020a15] text-slate-100 [background-image:radial-gradient(circle_at_2px_2px,rgba(59,130,246,0.17)_1px,transparent_0)] [background-size:26px_26px]">
+<div class="min-h-screen tb-page-bg text-base-content">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
-    <section class="mb-8 rounded-2xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
+    <section class="tb-panel-strong mb-8 rounded-2xl p-6 lg:p-8">
       <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 class="text-4xl font-black tracking-tight text-white">All Tournaments</h1>
-          <p class="mt-2 text-sm text-slate-400">
+          <h1 class="text-4xl font-black tracking-tight text-base-content">All Tournaments</h1>
+          <p class="mt-2 text-sm text-base-content/70">
             Discover events, filter by format and status, and jump into live tournament pages.
           </p>
-          <p class="mt-1 text-xs text-slate-500">Discover Your Next battleground.</p>
+          <p class="mt-1 text-xs text-base-content/60">Discover Your Next battleground.</p>
         </div>
 
         <%= if @current_user do %>
           <.link
             patch={~p"/tournaments/new"}
-            class="inline-flex items-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/15 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-blue-200 transition-colors hover:bg-blue-500/25"
+            class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/15 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-primary-content transition-colors hover:bg-primary/25"
           >
             <.icon name="hero-plus-solid" class="size-4" /> Create Tournament
           </.link>
         <% else %>
           <.link
             navigate={~p"/users/log_in"}
-            class="inline-flex items-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/15 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-blue-200 transition-colors hover:bg-blue-500/25"
+            class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/15 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-primary-content transition-colors hover:bg-primary/25"
           >
             <.icon name="hero-plus-solid" class="size-4" /> Create Tournament
           </.link>
@@ -33,11 +33,11 @@
         class="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-12"
       >
         <label class="lg:col-span-7">
-          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
             Search
           </span>
-          <span class="flex items-center rounded-xl border border-slate-700 bg-slate-900/80 px-3">
-            <.icon name="hero-magnifying-glass" class="mr-2 size-4 text-slate-500" />
+          <span class="flex items-center rounded-xl border border-base-300 bg-base-200/80 px-3">
+            <.icon name="hero-magnifying-glass" class="mr-2 size-4 text-base-content/60" />
             <input
               id="tournament-search"
               name="search"
@@ -46,19 +46,19 @@
               phx-debounce="300"
               autocomplete="off"
               placeholder="Search by tournament name..."
-              class="h-11 w-full border-none bg-transparent p-0 text-sm text-slate-100 placeholder:text-slate-500 focus:ring-0"
+              class="h-11 w-full border-none bg-transparent p-0 text-sm text-base-content placeholder:text-base-content/60 focus:ring-0"
             />
           </span>
         </label>
 
         <label class="lg:col-span-2">
-          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
             Format
           </span>
           <select
             id="filter-format"
             name="format"
-            class="h-11 w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 text-sm text-slate-100 outline-none focus:border-blue-500"
+            class="h-11 w-full rounded-xl border border-base-300 bg-base-200/80 px-3 text-sm text-base-content outline-none focus:border-primary"
           >
             <option value="">All Formats</option>
             <option value="edh" selected={@filter_format == "edh"}>EDH</option>
@@ -67,13 +67,13 @@
         </label>
 
         <label class="lg:col-span-3">
-          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-slate-500">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
             Status
           </span>
           <select
             id="filter-status"
             name="status"
-            class="h-11 w-full rounded-xl border border-slate-700 bg-slate-900/80 px-3 text-sm text-slate-100 outline-none focus:border-blue-500"
+            class="h-11 w-full rounded-xl border border-base-300 bg-base-200/80 px-3 text-sm text-base-content outline-none focus:border-primary"
           >
             <option value="">All Statuses</option>
             <option value="active" selected={@filter_status == "active"}>Active</option>
@@ -92,7 +92,7 @@
       >
         <div
           id="tournaments-empty-state"
-          class="hidden only:block rounded-2xl border border-slate-700 bg-slate-900/70 p-6 text-sm text-slate-400"
+          class="hidden only:block rounded-2xl border border-base-300 bg-base-200/70 p-6 text-sm text-base-content/70"
         >
           No tournaments found with your current filters.
         </div>
@@ -100,42 +100,43 @@
         <article
           :for={{dom_id, t} <- @streams.tournaments}
           id={dom_id}
-          class="group rounded-2xl border border-slate-700/70 bg-slate-900/75 p-5 transition-colors hover:border-blue-500/50"
+          class="group rounded-2xl border border-base-300/70 bg-base-200/75 p-5 transition-colors hover:border-primary/50"
         >
-          <div class="mb-5 flex items-center justify-between border-b border-slate-700/60 pb-4">
-            <p class="line-clamp-1 text-xl font-bold tracking-tight text-white capitalize">
+          <div class="mb-5 flex items-center justify-between border-b border-base-300/60 pb-4">
+            <p class="line-clamp-1 text-xl font-bold tracking-tight text-base-content capitalize">
               {t.name}
             </p>
             <span class={[
               "rounded-2xl px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em]",
               t.status == :active &&
-                "border border-emerald-500/40 bg-emerald-500/20 text-emerald-300",
-              t.status == :inactive && "border border-blue-500/40 bg-blue-500/20 text-blue-300",
-              t.status == :finished && "border border-slate-500/40 bg-slate-500/20 text-slate-300"
+                "border border-success/40 bg-success/20 text-success",
+              t.status == :inactive && "border border-primary/40 bg-primary/20 text-primary",
+              t.status == :finished &&
+                "border border-base-300/40 bg-base-200/40 text-base-content/80"
             ]}>
               {t.status}
             </span>
           </div>
 
-          <div class="space-y-2 text-sm text-slate-300">
+          <div class="space-y-2 text-sm text-base-content/80">
             <p class="inline-flex items-center gap-2">
-              <.icon name="hero-map-pin-solid" class="size-4 text-slate-500" /> {t.location}
+              <.icon name="hero-map-pin-solid" class="size-4 text-base-content/60" /> {t.location}
             </p>
             <p class="inline-flex items-center gap-2">
               <.date dt={t.date} />
             </p>
             <p class="inline-flex items-center gap-2">
-              <.icon name="hero-puzzle-piece" class="size-4 text-slate-500" /> {t.game.name}
+              <.icon name="hero-puzzle-piece" class="size-4 text-base-content/60" /> {t.game.name}
             </p>
             <p class="inline-flex items-center gap-2">
-              <.icon name="hero-clock" class="size-4 text-slate-500" /> {t.round_count} Rounds
+              <.icon name="hero-clock" class="size-4 text-base-content/60" /> {t.round_count} Rounds
             </p>
           </div>
 
-          <div class="mt-5 flex items-center justify-between border-t border-slate-700/60 pt-4">
+          <div class="mt-5 flex items-center justify-between border-t border-base-300/60 pt-4">
             <.link
               navigate={~p"/tournaments/#{t.id}"}
-              class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-blue-300 hover:text-blue-200"
+              class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-primary hover:text-primary-content"
             >
               View tournament <.icon name="hero-arrow-right-solid" class="size-4" />
             </.link>
@@ -143,7 +144,7 @@
             <.link
               :if={@current_user && @current_user.id == t.user_id}
               patch={~p"/tournaments/#{t.id}/edit"}
-              class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-slate-300 hover:text-white"
+              class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-base-content/80 hover:text-base-content"
             >
               <.icon name="hero-pencil-square-solid" class="size-4" /> Edit
             </.link>
@@ -153,18 +154,18 @@
     </section>
 
     <div id="pagination" class="mt-10 flex justify-center">
-      <div class="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/70 p-2">
+      <div class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/70 p-2">
         <.link
           :if={@has_previous_page?}
           navigate={
             ~p"/tournaments?page=#{@page - 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
           }
-          class="inline-flex size-9 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition-colors hover:border-blue-500/50 hover:text-white"
+          class="inline-flex size-9 items-center justify-center rounded-lg border border-base-300 text-base-content/80 transition-colors hover:border-primary/50 hover:text-base-content"
         >
           <.icon name="hero-chevron-left" class="size-4" />
         </.link>
 
-        <span class="inline-flex size-9 items-center justify-center rounded-lg bg-blue-500/20 text-sm font-bold text-blue-200">
+        <span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/20 text-sm font-bold text-primary-content">
           {@page}
         </span>
 
@@ -173,7 +174,7 @@
           navigate={
             ~p"/tournaments?page=#{@page + 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
           }
-          class="inline-flex size-9 items-center justify-center rounded-lg border border-slate-700 text-slate-300 transition-colors hover:border-blue-500/50 hover:text-white"
+          class="inline-flex size-9 items-center justify-center rounded-lg border border-base-300 text-base-content/80 transition-colors hover:border-primary/50 hover:text-base-content"
         >
           <.icon name="hero-chevron-right" class="size-4" />
         </.link>

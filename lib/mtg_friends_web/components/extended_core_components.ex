@@ -201,17 +201,17 @@ defmodule MtgFriendsWeb.ExtendedCoreComponents do
 
     timer_class =
       cond do
-        ds > 60 * 5 and ds <= 60 * 10 -> "rounded-lg bg-yellow-200"
-        ds >= 60 and ds <= 60 * 5 -> "rounded-lg bg-orange-200"
-        ds > 0 and ds < 60 -> "animate-bounce rounded-lg bg-red-200"
-        ds <= 0 -> "rounded-lg bg-red-200"
+        ds > 60 * 5 and ds <= 60 * 10 -> "badge badge-warning"
+        ds >= 60 and ds <= 60 * 5 -> "badge badge-warning"
+        ds > 0 and ds < 60 -> "animate-bounce badge badge-error"
+        ds <= 0 -> "badge badge-error"
         true -> ""
       end
 
     assigns = assign(assigns, :timer_class, timer_class)
 
     ~H"""
-    <div class="round_countdown_timer" class={["", @timer_class]}>
+    <div class={["round_countdown_timer", @timer_class]}>
       Round time: <span class="font-mono">{@time_left}</span>
     </div>
     """

@@ -1,14 +1,14 @@
-<div class="min-h-screen bg-[#020a15] text-slate-100 [background-image:radial-gradient(circle_at_2px_2px,rgba(59,130,246,0.17)_1px,transparent_0)] [background-size:26px_26px]">
+<div class="min-h-screen tb-page-bg text-base-content">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
-      <div class="inline-flex items-center gap-1 rounded-xl border border-slate-700/80 bg-slate-900/60 p-1">
+      <div class="inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
         <.link
           navigate={~p"/tournaments/#{@tournament_id}"}
-          class="rounded-lg border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-slate-400 transition-colors hover:border-slate-700 hover:text-slate-200"
+          class="rounded-lg border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content/85"
         >
           Event Overview
         </.link>
-        <span class="rounded-lg border border-blue-500/80 bg-blue-500/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-blue-300">
+        <span class="rounded-lg border border-primary/80 bg-primary/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-primary">
           Round Information
         </span>
       </div>
@@ -24,7 +24,7 @@
             phx-click="create-round"
             disabled={!@can_start_new_round?}
             phx-disable-with="Starting..."
-            class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-blue-100 disabled:cursor-not-allowed disabled:opacity-40"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-primary-content disabled:cursor-not-allowed disabled:opacity-40"
           >
             <.icon name="hero-plus-solid" class="size-4" /> Start New Round
           </button>
@@ -34,22 +34,22 @@
             class={[
               "block w-full rounded-xl border px-6 py-4 transition-all",
               round.number == @round_number &&
-                "border-blue-500 bg-blue-500/15 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.25)]",
+                "border-primary bg-primary/15 text-base-content ring-1 ring-primary/30",
               round.number != @round_number &&
-                "border-slate-700/70 bg-slate-900/65 text-slate-200 hover:border-blue-500/50"
+                "border-base-300/70 bg-base-200/65 text-base-content/85 hover:border-primary/50"
             ]}
           >
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-2xl font-bold tracking-tight">Round {round.number + 1}</p>
-                <p class="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+                <p class="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-base-content/70">
                   {String.upcase(to_string(round.status))}
                 </p>
               </div>
               <.icon
                 name="hero-clock-solid"
                 class={
-                            "size-4 #{if round.number == @round_number, do: "text-blue-400", else: "text-slate-500"}"
+                            "size-4 #{if round.number == @round_number, do: "text-primary", else: "text-base-content/60"}"
                         }
               />
             </div>
@@ -58,13 +58,13 @@
       </aside>
 
       <section class="min-w-0 flex-1 space-y-8">
-        <div class="rounded-2xl border border-slate-700/80 bg-gradient-to-r from-slate-900/85 to-slate-800/70 p-6 lg:p-8">
+        <div class="tb-panel-strong rounded-2xl p-6 lg:p-8">
           <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 class="text-3xl font-black tracking-tight text-white">
+              <h2 class="text-3xl font-black tracking-tight text-base-content">
                 Round {@round_number + 1} Pairings
               </h2>
-              <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+              <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-base-content/70">
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-information-circle-solid" class="size-4" />
                   {case @round_status do
@@ -73,38 +73,40 @@
                     _ -> "asd"
                   end}
                 </span>
-                <span class="h-1 w-1 rounded-2xl bg-slate-600"></span>
+                <span class="h-1 w-1 rounded-2xl bg-base-content/40"></span>
                 <span class="inline-flex items-center gap-1">
                   <.icon name="hero-squares-2x2-solid" class="size-4" /> {length(@pairings)} Pods
                 </span>
               </div>
             </div>
-            <div class="flex items-center gap-6 rounded-xl border border-slate-700/80 bg-slate-900/55 px-4 py-3">
+            <div class="flex items-center gap-6 rounded-xl border border-base-300/80 bg-base-200/55 px-4 py-3">
               <div class="text-right">
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Pods</p>
-                <p class="text-2xl font-black text-white">{length(@pairings)}</p>
+                <p class="text-xs font-bold uppercase tracking-[0.18em] text-base-content/60">
+                  Pods
+                </p>
+                <p class="text-2xl font-black text-base-content">{length(@pairings)}</p>
               </div>
-              <div :if={@round_status == :active} class="h-8 w-px bg-slate-700"></div>
+              <div :if={@round_status == :active} class="h-8 w-px bg-base-content/30"></div>
               <div :if={@round_status == :active} class="text-right">
-                <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
+                <p class="text-xs font-bold uppercase tracking-[0.18em] text-base-content/60">
                   Time Remaining
                 </p>
-                <p class="text-2xl font-black text-blue-400">{elem(@round_countdown_timer, 1)}</p>
+                <p class="text-2xl font-black text-primary">{elem(@round_countdown_timer, 1)}</p>
               </div>
             </div>
           </div>
           <div
             :if={@current_user_owner and @round_status == :inactive}
-            class="mt-5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4"
+            class="mt-5 rounded-2xl border border-success/30 bg-success/10 p-4"
           >
-            <p class="mb-3 text-sm text-emerald-200">
+            <p class="mb-3 text-sm text-success-content">
               This round's pods are generated and ready to start.
             </p>
             <button
               type="button"
               phx-click="start-round"
               phx-disable-with="Starting..."
-              class="inline-flex items-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-emerald-100"
+              class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-success-content"
             >
               <.icon name="hero-rocket-launch-solid" class="size-4" /> Start Round
             </button>
@@ -114,29 +116,29 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
           <article
             :for={{pairing, pairing_index} <- @pairings |> Enum.with_index()}
-            class="rounded-xl border border-slate-700/70 bg-slate-900/45 p-6 transition-colors"
+            class="rounded-xl border border-base-300/70 bg-base-200/45 p-6 transition-colors"
           >
-            <div class="mb-5 border-b border-slate-700/60 pb-4">
+            <div class="mb-5 border-b border-base-300/60 pb-4">
               <div class="flex items-start justify-between">
                 <div>
-                  <p class="text-5xl font-black tracking-tight text-blue-500/90">
+                  <p class="text-5xl font-black tracking-tight text-primary/90">
                     {(pairing_index + 1) |> Integer.to_string() |> String.pad_leading(2, "0")}
                   </p>
-                  <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+                  <p class="text-xs font-bold uppercase tracking-[0.2em] text-base-content/60">
                     Pod
                   </p>
                 </div>
                 <div class="text-right">
-                  <p class="text-xs font-bold uppercase tracking-widest text-slate-500">
+                  <p class="text-xs font-bold uppercase tracking-widest text-base-content/60">
                     Status
                   </p>
                   <p class={[
                     "mt-1 inline-flex rounded-2xl px-2 py-1 text-xs font-bold",
-                    @round_status == :inactive && "bg-slate-700/70 text-slate-200",
+                    @round_status == :inactive && "bg-base-200/70 text-base-content/85",
                     @round_status != :inactive && pairing.active &&
-                      "bg-amber-500/20 text-amber-300",
+                      "bg-warning/20 text-warning",
                     @round_status != :inactive && not pairing.active &&
-                      "bg-emerald-500/20 text-emerald-300"
+                      "bg-success/20 text-success"
                   ]}>
                     {if @round_status == :inactive,
                       do: "Waiting",
@@ -155,21 +157,21 @@
                 class={[
                   "flex items-center justify-between rounded-2xl px-3 py-2",
                   pairing.winner_id == pp.participant_id &&
-                    "border border-emerald-500/40 bg-emerald-500/15",
-                  pairing.winner_id != pp.participant_id && "text-slate-300"
+                    "border border-success/40 bg-success/15",
+                  pairing.winner_id != pp.participant_id && "text-base-content/80"
                 ]}
               >
                 <p class={[
                   "text-xl font-semibold tracking-tight",
-                  pairing.winner_id == pp.participant_id && "text-white",
-                  pairing.winner_id != pp.participant_id && "text-slate-300"
+                  pairing.winner_id == pp.participant_id && "text-base-content",
+                  pairing.winner_id != pp.participant_id && "text-base-content/80"
                 ]}>
                   {pp.participant.name}
                 </p>
                 <p class={[
                   "text-xl font-black",
-                  pairing.winner_id == pp.participant_id && "text-emerald-300",
-                  pairing.winner_id != pp.participant_id && "text-slate-300"
+                  pairing.winner_id == pp.participant_id && "text-success",
+                  pairing.winner_id != pp.participant_id && "text-base-content/80"
                 ]}>
                   {pp.points} pts
                 </p>
@@ -182,7 +184,7 @@
                 ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
               }
               phx-click={JS.push_focus()}
-              class="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-500/40 bg-blue-500/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-blue-200"
+              class="mt-4 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-primary-content"
             >
               <.icon name="hero-pencil-square-solid" class="size-4" />
               {if pairing.active, do: "Assign Pod Results", else: "Update Pod Results"}
@@ -191,8 +193,8 @@
         </div>
 
         <div class="py-12 text-center">
-          <div class="mx-auto mb-4 h-px w-24 bg-slate-700"></div>
-          <p class="text-xs font-bold uppercase tracking-[0.3em] text-slate-500">
+          <div class="mx-auto mb-4 h-px w-24 bg-base-content/30"></div>
+          <p class="text-xs font-bold uppercase tracking-[0.3em] text-base-content/60">
             End of round {@round_number + 1} list
           </p>
         </div>

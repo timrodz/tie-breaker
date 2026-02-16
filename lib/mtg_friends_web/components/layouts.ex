@@ -9,35 +9,35 @@ defmodule MtgFriendsWeb.Layouts do
 
     ~H"""
     <div class="flex min-h-screen flex-col">
-      <nav class="z-20 border-b border-slate-800/70 bg-[#101822]/95 px-4 py-4 backdrop-blur-md lg:px-6">
+      <nav class="z-20 border-b border-base-300/70 bg-base-200/95 px-4 py-4 backdrop-blur-md lg:px-6">
         <div class="mx-auto flex w-full max-w-[1800px] items-center justify-between">
           <.link
             navigate="/"
             class="flex items-center gap-3"
           >
-            <div class="flex size-10 items-center justify-center rounded-xl bg-blue-500">
-              <.icon name="hero-bolt-solid" class="size-5 text-white" />
+            <div class="flex size-10 items-center justify-center rounded-xl bg-primary">
+              <.icon name="hero-bolt-solid" class="size-5 text-base-content" />
             </div>
-            <span class="text-2xl font-black tracking-tight text-white">TIE BREAKER</span>
+            <span class="text-2xl font-black tracking-tight text-base-content">TIE BREAKER</span>
           </.link>
 
           <div class="flex items-center gap-3">
             <%!-- <.link
               navigate={~p"/tournaments"}
-              class="hidden text-xs font-bold uppercase tracking-[0.2em] text-slate-300 transition-colors hover:text-white md:inline"
+              class="hidden text-xs font-bold uppercase tracking-[0.2em] text-base-content/80 transition-colors hover:text-base-content md:inline"
             >
               Tournaments
             </.link> --%>
 
             <details class="relative">
-              <summary class="flex size-10 list-none cursor-pointer items-center justify-center rounded-2xl border border-blue-500/40 bg-blue-500/10 text-blue-300 transition-colors hover:bg-blue-500/20">
+              <summary class="flex size-10 list-none cursor-pointer items-center justify-center rounded-2xl border border-primary/40 bg-primary/10 text-primary transition-colors hover:bg-primary/20">
                 <.icon name="hero-bars-3-solid" class="size-5" />
               </summary>
 
-              <div class="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-slate-700 bg-slate-900/95 p-2 shadow-xl">
+              <div class="absolute right-0 z-50 mt-2 w-48 rounded-xl border border-base-300 bg-base-200/95 p-2 shadow-xl">
                 <.link
                   navigate={~p"/tournaments"}
-                  class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                  class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-base-content/80 transition-colors hover:bg-base-200 hover:text-base-content"
                 >
                   Tournaments
                 </.link>
@@ -45,27 +45,27 @@ defmodule MtgFriendsWeb.Layouts do
                 <%= if @current_user do %>
                   <.link
                     navigate={~p"/users/settings"}
-                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-base-content/80 transition-colors hover:bg-base-200 hover:text-base-content"
                   >
                     Settings
                   </.link>
                   <.link
                     href={~p"/users/log_out"}
                     method="delete"
-                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-base-content/80 transition-colors hover:bg-base-200 hover:text-base-content"
                   >
                     Log out
                   </.link>
                 <% else %>
                   <.link
                     navigate={~p"/users/log_in"}
-                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-base-content/80 transition-colors hover:bg-base-200 hover:text-base-content"
                   >
                     Log in
                   </.link>
                   <.link
                     navigate={~p"/users/register"}
-                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+                    class="block rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-[0.15em] text-base-content/80 transition-colors hover:bg-base-200 hover:text-base-content"
                   >
                     Register
                   </.link>
@@ -80,17 +80,17 @@ defmodule MtgFriendsWeb.Layouts do
         {@inner_content}
       </main>
 
-      <footer class="border-t border-slate-800 bg-[#040d19]/90 py-4">
-        <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-xs font-bold uppercase tracking-[0.22em] text-slate-500 md:flex-row lg:px-6">
+      <footer class="border-t border-base-300 bg-base-200/90 py-4">
+        <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-xs font-bold uppercase tracking-[0.22em] text-base-content/60 md:flex-row lg:px-6">
           <div class="flex items-center gap-8">
-            <span class="inline-flex items-center gap-2 text-emerald-400">
-              <span class="size-2 rounded-2xl bg-emerald-500"></span> System: Operational
+            <span class="inline-flex items-center gap-2 text-success">
+              <span class="size-2 rounded-2xl bg-success"></span> System: Operational
             </span>
             <span>Version: {@app_version}</span>
           </div>
-          <div class="inline-flex items-center gap-2 text-slate-400">
+          <div class="inline-flex items-center gap-2 text-base-content/70">
             Powered by the Tie Breaker Engine
-            <.icon name="hero-bolt-solid" class="size-3.5 text-blue-400" />
+            <.icon name="hero-bolt-solid" class="size-3.5 text-primary" />
           </div>
           <.theme_toggle />
         </div>
