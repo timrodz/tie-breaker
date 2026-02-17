@@ -24,9 +24,9 @@
       </div>
     </nav>
 
-    <main class="flex flex-col gap-8 xl:flex-row">
-      <aside class="w-full xl:w-72">
-        <div class="space-y-4 xl:sticky xl:top-28">
+    <main class="flex flex-col gap-8 lg:flex-row">
+      <aside class="w-full lg:w-72">
+        <div class="space-y-4 lg:sticky lg:top-28">
           <div class="rounded-xl border border-primary/25 tb-panel-strong p-6">
             <p class="mb-4 text-xs font-bold uppercase tracking-wider text-base-content/70">
               Event Stats
@@ -61,6 +61,23 @@
                   subformat={@tournament.subformat}
                   class="text-lg font-bold text-base-content"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div
+            :if={@tournament_qr_svg}
+            class="rounded-xl border border-primary/25 tb-panel-strong p-6"
+          >
+            <p class="mb-4 text-xs font-bold uppercase tracking-wider text-base-content/70">
+              Share Tournament via QR Code
+            </p>
+            <div
+              id="tournament-qr-code"
+              class="mx-auto flex items-center justify-center"
+            >
+              <div class="rounded-full">
+                {raw(@tournament_qr_svg)}
               </div>
             </div>
           </div>

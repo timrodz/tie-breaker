@@ -76,10 +76,11 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
     setup [:create_tournament]
 
     test "displays tournament", %{conn: conn, tournament: tournament} do
-      {:ok, _show_live, html} = live(conn, ~p"/tournaments/#{tournament}")
+      {:ok, show_live, html} = live(conn, ~p"/tournaments/#{tournament}")
 
       assert html =~ tournament.name
       assert html =~ tournament.location
+      assert has_element?(show_live, "#tournament-qr-code svg")
     end
 
     test "updates tournament within modal" do

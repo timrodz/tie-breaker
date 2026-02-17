@@ -2,6 +2,7 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
   use MtgFriendsWeb, :live_view
 
   alias MtgFriends.Participants
+  alias MtgFriends.QR
   alias MtgFriends.Rounds
   alias MtgFriends.Tournaments
   alias MtgFriends.Utils.Date
@@ -18,6 +19,8 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
   def handle_params(%{"id" => id}, _, socket) do
     tournament =
       Tournaments.get_tournament!(id)
+
+    tournament_public_url = tournament_public_url(tournament.id)
 
     participant_score_lookup =
       Participants.get_participant_standings(tournament.participants)
@@ -74,6 +77,8 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
      |> assign(:has_winner?, not is_nil(winner))
      |> assign(:page_title, page_title(live_action, tournament.name))
      |> assign(:tournament, tournament)
+     |> assign(:tournament_public_url, tournament_public_url)
+     |> assign(:tournament_qr_svg, QR.svg(tournament_public_url))
      |> assign(:rounds, tournament.rounds)
      |> assign(:rounds_desc, rounds_desc)
      |> assign(:active_round, active_round)
@@ -103,6 +108,10 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
   defp page_title(:show, tournament_name), do: "#{tournament_name}"
   defp page_title(:edit, tournament_name), do: "Edit #{tournament_name}"
   defp page_title(:end, tournament_name), do: "Finish #{tournament_name}"
+
+  defp tournament_public_url(tournament_id) do
+    MtgFriendsWeb.Endpoint.url() <> ~p"/tournaments/#{tournament_id}"
+  end
 
   @impl true
   def handle_event("create-round", _, socket) do

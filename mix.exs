@@ -79,6 +79,7 @@ defmodule MtgFriends.MixProject do
       {:hammer, "~> 7.0"},
       {:open_api_spex, "~> 3.18"},
       {:expletive, "~> 0.1.0"},
+      {:qr_code, "~> 3.2"},
       {:remote_ip, "~> 1.1"},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
