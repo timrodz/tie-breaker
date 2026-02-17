@@ -10,12 +10,13 @@
             Find tournaments, filter by format and status, and jump into their pages.
           </p>
         </div>
-        <.link
+        <.button
           patch={~p"/tournaments/new"}
-          class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/15 px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary/25"
+          variant="soft"
+          class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wider"
         >
           <.icon name="hero-plus-solid" class="size-4" /> Create Tournament
-        </.link>
+        </.button>
       </div>
 
       <form
@@ -24,10 +25,10 @@
         class="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-12"
       >
         <label class="lg:col-span-7">
-          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-wider text-base-content/60">
             Search
           </span>
-          <span class="flex items-center rounded-xl border border-base-300 bg-base-200/80 px-3">
+          <span class="flex items-center rounded-xl border border-base-300 bg-base-200/80 px-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/40">
             <.icon name="hero-magnifying-glass" class="mr-2 size-4 text-base-content/60" />
             <input
               id="tournament-search"
@@ -37,13 +38,13 @@
               phx-debounce="300"
               autocomplete="off"
               placeholder="Search by tournament name..."
-              class="h-11 w-full border-none bg-transparent p-0 text-sm text-base-content placeholder:text-base-content/60 focus:ring-0"
+              class="h-11 w-full border-none bg-transparent p-0 text-sm text-base-content placeholder:text-base-content/60 focus:outline-none focus:ring-0"
             />
           </span>
         </label>
 
         <label class="lg:col-span-2">
-          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-wider text-base-content/60">
             Format
           </span>
           <select
@@ -58,7 +59,7 @@
         </label>
 
         <label class="lg:col-span-3">
-          <span class="mb-1 block text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-wider text-base-content/60">
             Status
           </span>
           <select
@@ -104,29 +105,31 @@
 
     <div id="pagination" class="mt-10 flex justify-center">
       <div class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/70 p-2">
-        <.link
+        <.button
           :if={@has_previous_page?}
           navigate={
             ~p"/tournaments?page=#{@page - 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
           }
-          class="inline-flex size-9 items-center justify-center rounded-lg border border-base-300 text-base-content/80 transition-colors hover:border-primary/50 hover:text-base-content"
+          variant="neutral"
+          class="btn-square btn-sm"
         >
           <.icon name="hero-chevron-left" class="size-4" />
-        </.link>
+        </.button>
 
         <span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/20 text-sm font-bold text-primary">
           {@page}
         </span>
 
-        <.link
+        <.button
           :if={@has_next_page?}
           navigate={
             ~p"/tournaments?page=#{@page + 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
           }
-          class="inline-flex size-9 items-center justify-center rounded-lg border border-base-300 text-base-content/80 transition-colors hover:border-primary/50 hover:text-base-content"
+          variant="neutral"
+          class="btn-square btn-sm"
         >
           <.icon name="hero-chevron-right" class="size-4" />
-        </.link>
+        </.button>
       </div>
     </div>
   </div>

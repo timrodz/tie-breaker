@@ -14,12 +14,12 @@ defmodule MtgFriendsWeb.LandingHTML do
             </div>
             <span class="text-2xl font-bold tracking-tight text-base-content">TIE BREAKER</span>
           </div>
-          <.link
+          <.button
             navigate={~p"/tournaments/new"}
-            class="rounded-xl bg-primary px-7 py-2.5 text-sm font-bold text-primary-content transition-colors hover:bg-primary/85"
+            class="btn-sm rounded-xl px-7 py-2.5 text-sm font-bold uppercase"
           >
             START YOUR FIRST EVENT
-          </.link>
+          </.button>
         </div>
       </nav>
 
@@ -35,22 +35,24 @@ defmodule MtgFriendsWeb.LandingHTML do
             </h1>
 
             <p class="max-w-[46rem] text-2xl leading-relaxed text-base-content/70">
-              The most powerful pairing engine for Magic: The Gathering and other TCGs. Built specifically for complex 3-4 player pod logic, live standings, and seamless round management.
+              The most powerful pairing engine for Magic: The Gathering. Built specifically for complex 3-4 player pod logic, live standings, and seamless round management.
             </p>
 
             <div class="flex flex-col items-center gap-4 pt-2 sm:flex-row">
-              <.link
+              <.button
                 navigate={~p"/tournaments/new"}
-                class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-10 py-4 text-xl font-bold text-primary-content transition-colors hover:bg-primary/85 sm:w-auto"
+                variant="primary"
+                class="text-xl font-bold uppercase tracking-wide"
               >
                 Start Your First Event <.icon name="hero-arrow-right-solid" class="size-6" />
-              </.link>
-              <.link
+              </.button>
+              <.button
                 href="#main-features"
-                class="w-full rounded-xl border border-base-300 px-10 py-4 text-center text-xl font-bold text-base-content/80 transition-colors hover:bg-base-200 sm:w-auto"
+                variant="neutral"
+                class="font-semibold text-xl capitalize"
               >
                 Explore Features
-              </.link>
+              </.button>
             </div>
           </div>
         </section>

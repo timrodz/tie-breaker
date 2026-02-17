@@ -23,7 +23,7 @@ defmodule MtgFriendsWeb.GameLive.FormComponent do
         <.input field={@form[:code]} type="text" label="Code" />
         <.input field={@form[:url]} type="text" label="Url" />
         <:actions>
-          <.button phx-disable-with="Saving...">Save Game</.button>
+          <.button phx-disable-with="Saving..." variant="primary">Save Game</.button>
         </:actions>
       </.simple_form>
     </div>

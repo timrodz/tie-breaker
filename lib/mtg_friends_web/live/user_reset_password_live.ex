@@ -26,7 +26,9 @@ defmodule MtgFriendsWeb.UserResetPasswordLive do
           required
         />
         <:actions>
-          <.button phx-disable-with="Resetting..." class="w-full">Reset Password</.button>
+          <.button phx-disable-with="Resetting..." variant="primary" class="w-full">
+            Reset Password
+          </.button>
         </:actions>
       </.simple_form>
 

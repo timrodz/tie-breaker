@@ -36,7 +36,7 @@
     --color-secondary-content: oklch(20% 0.042 265.755);
     --color-accent: oklch(75% 0.183 55.934);
     --color-accent-content: oklch(26% 0.079 36.259);
-    --color-neutral: oklch(37% 0.034 259.733);
+    --color-neutral: oklch(80% 0.045 259.733);
     --color-neutral-content: oklch(87.889% 0.006 275.524);
     --color-info: oklch(58% 0.158 241.966);
     --color-info-content: oklch(98% 0.003 247.858);
@@ -71,7 +71,7 @@
     --color-secondary-content: oklch(98% 0.003 247.858);
     --color-accent: oklch(57% 0.222 41.116);
     --color-accent-content: oklch(98% 0.003 247.858);
-    --color-neutral: oklch(27% 0.006 286.033);
+    --color-neutral: oklch(40% 0.01 286.033);
     --color-neutral-content: oklch(98% 0 0);
     --color-info: oklch(55% 0.158 241.966);
     --color-info-content: oklch(98% 0.003 247.858);
@@ -194,5 +194,9 @@
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
 
 button {
+    @apply hover:cursor-pointer;
+}
+
+select {
     @apply hover:cursor-pointer;
 }

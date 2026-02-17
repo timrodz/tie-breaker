@@ -12,7 +12,7 @@ defmodule MtgFriendsWeb.TournamentComponents do
   def tournament_status_badge(assigns) do
     ~H"""
     <span class={[
-      "rounded-2xl px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em]",
+      "rounded-2xl px-2.5 py-1 text-xs font-bold uppercase",
       status_classes(@status),
       @class
     ]}>
@@ -75,51 +75,53 @@ defmodule MtgFriendsWeb.TournamentComponents do
 
       <div
         :if={@progress_text}
-        class="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-base-content/60"
+        class="mb-2 text-xs font-bold uppercase tracking-wider text-base-content/60"
       >
         {@progress_text}
       </div>
 
       <div class="space-y-2 text-sm text-base-content/80">
-        <p class="inline-flex items-center gap-2">
-          <.icon name="hero-map-pin-solid" class="size-4 text-base-content/60" /> {@tournament.location}
+        <p class="inline-flex items-center gap-1 capitalize">
+          <.icon name="hero-map-pin-solid" class="size-4" />{@tournament.location}
         </p>
-        <p class="inline-flex items-center gap-2">
+        <p class="inline-flex items-center gap-1">
           <.date dt={@tournament.date} />
         </p>
-        <p :if={@game_name} class="inline-flex items-center gap-2">
-          <.icon name="hero-puzzle-piece" class="size-4 text-base-content/60" />
+        <p :if={@game_name} class="inline-flex items-center gap-1">
+          <.icon name="hero-puzzle-piece" class="size-4" />
           {@game_name}
         </p>
-        <p :if={Map.get(@tournament, :round_count)} class="inline-flex items-center gap-2">
-          <.icon name="hero-clock" class="size-4 text-base-content/60" />
+        <p :if={Map.get(@tournament, :round_count)} class="inline-flex items-center gap-1">
+          <.icon name="hero-clock" class="size-4" />
           {@tournament.round_count} Rounds
         </p>
-        <p :if={@show_format} class="inline-flex items-center gap-2">
-          <.icon name="hero-squares-2x2-solid" class="size-4 text-base-content/60" />
+        <p :if={@show_format} class="inline-flex items-center gap-1">
+          <.icon name="hero-squares-2x2-solid" class="size-4" />
           <.tournament_format format={@tournament.format} />
         </p>
-        <p :if={@player_count} class="inline-flex items-center gap-2">
-          <.icon name="hero-users-solid" class="size-4 text-base-content/60" />
+        <p :if={@player_count} class="inline-flex items-center gap-1">
+          <.icon name="hero-users-solid" class="size-4" />
           {@player_count} Players
         </p>
       </div>
 
       <div class="mt-5 flex items-center justify-between border-t border-base-300/60 pt-4">
-        <.link
+        <.button
           navigate={@navigate_to}
-          class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-primary"
+          variant="soft"
+          class="btn-sm inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider"
         >
           {@cta_label} <.icon name="hero-arrow-right-solid" class="size-4" />
-        </.link>
+        </.button>
 
-        <.link
+        <.button
           :if={@show_edit && @edit_patch}
           patch={@edit_patch}
-          class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-base-content/80 hover:text-base-content"
+          variant="neutral"
+          class="btn-sm inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider"
         >
           <.icon name="hero-pencil-square-solid" class="size-4" /> Edit
-        </.link>
+        </.button>
       </div>
     </article>
     """
@@ -129,8 +131,8 @@ defmodule MtgFriendsWeb.TournamentComponents do
     case status do
       :active -> "border border-success/40 bg-success/20 text-success"
       :inactive -> "border border-primary/40 bg-primary/20 text-primary"
-      :finished -> "border border-base-300/40 bg-base-200/40 text-base-content/80"
-      _ -> "border border-base-300/40 bg-base-200/40 text-base-content/80"
+      :finished -> "border border-error/40 bg-error/20 text-error"
+      _ -> "border border-base-300/40 bg-base-200/40 text-base-content"
     end
   end
 

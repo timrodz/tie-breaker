@@ -2,38 +2,38 @@
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
       <div class="tb-panel-strong inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
-        <.link
+        <.button
           navigate={~p"/tournaments/#{@tournament.id}"}
-          class="rounded-xl border border-primary/80 bg-primary/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-primary"
+          variant="primary"
+          class="px-8 py-3 text-sm font-bold uppercase tracking-widest"
         >
-          Event Overview
-        </.link>
-        <.link
-          :if={@latest_round}
-          navigate={~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}"}
-          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content/85"
+          Overview
+        </.button>
+        <.button
+          navigate={
+            if @latest_round,
+              do: ~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}",
+              else: ~p"/tournaments/#{@tournament.id}"
+          }
+          variant="neutral"
+          disabled={is_nil(@latest_round)}
+          class="px-8 py-3 text-sm font-bold uppercase tracking-widest"
         >
           Round Information
-        </.link>
-        <span
-          :if={is_nil(@latest_round)}
-          class="rounded-xl border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-base-content/50"
-        >
-          Round Information
-        </span>
+        </.button>
       </div>
     </nav>
 
     <main class="flex flex-col gap-8 xl:flex-row">
       <aside class="w-full xl:w-72">
         <div class="space-y-4 xl:sticky xl:top-28">
-          <div class="rounded-2xl border border-primary/25 tb-panel-strong p-6">
-            <p class="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-base-content/70">
+          <div class="rounded-xl border border-primary/25 tb-panel-strong p-6">
+            <p class="mb-4 text-xs font-bold uppercase tracking-wider text-base-content/70">
               Event Stats
             </p>
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <span class="text-sm text-base-content/70">Tournament Status</span>
+                <span class="text-sm text-base-content/70">Status</span>
                 <.tournament_status_badge status={@tournament.status} />
               </div>
               <div class="flex items-center justify-between">
@@ -46,12 +46,6 @@
                 <span class="text-sm text-base-content/70">Cut to Top</span>
                 <span class="text-2xl font-bold text-base-content">
                   4
-                </span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-sm text-base-content/70">Game</span>
-                <span class="text-lg font-bold text-base-content">
-                  {@tournament.game.name}
                 </span>
               </div>
               <div class="flex items-center justify-between">
@@ -86,18 +80,21 @@
                 <span class="inline-flex items-center gap-1">
                   <.date dt={@tournament.date} />
                 </span>
+                <span class="h-1 w-1 rounded-2xl bg-base-content/40"></span>
+                <span>{@tournament.game.name}</span>
               </div>
             </div>
             <div class="flex flex-wrap gap-3">
-              <.link
+              <.button
                 :if={@current_user_owner or @current_user_admin}
                 patch={~p"/tournaments/#{@tournament}/show/edit"}
                 phx-click={JS.push_focus()}
-                class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/60 px-5 py-3 text-sm font-bold uppercase tracking-wide text-base-content/85 transition-colors hover:border-primary/50"
+                variant="neutral"
+                class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wide"
               >
                 <.icon name="hero-adjustments-horizontal-solid" class="size-4" /> Edit
-              </.link>
-              <button
+              </.button>
+              <.button
                 :if={@current_user_owner && @tournament.status != :finished}
                 type="button"
                 phx-click="create-round"
@@ -105,18 +102,20 @@
                   not @all_participants_have_names? or @is_current_round_active? or
                     not @has_enough_participants?
                 }
-                class="inline-flex items-center gap-2 rounded-xl border border-primary bg-primary/20 px-5 py-3 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:bg-primary/30 disabled:cursor-not-allowed disabled:opacity-40"
+                variant="primary"
+                class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wide"
               >
                 <.icon name="hero-plus-solid" class="size-4" />
                 {if length(@rounds) == 0, do: "Start Tournament", else: "Begin New Round"}
-              </button>
-              <.link
+              </.button>
+              <.button
                 :if={@latest_round}
                 navigate={~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}"}
-                class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-5 py-3 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:bg-primary/20"
+                variant="soft"
+                class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wide"
               >
                 <.icon name="hero-arrow-right-solid" class="size-4" /> Go To Round Information
-              </.link>
+              </.button>
             </div>
           </div>
           <div
@@ -209,24 +208,26 @@
             </div>
 
             <:actions :if={@current_user_owner && length(@tournament.participants) > 0}>
-              <button
+              <.button
                 type="submit"
                 phx-disable-with="Saving..."
-                class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-success"
+                variant="success"
+                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase tracking-wide"
               >
                 <.icon name="hero-check-solid" class="size-4" /> Save Changes
-              </button>
+              </.button>
             </:actions>
 
             <:actions :if={@current_user_owner && length(@rounds) == 0}>
-              <button
+              <.button
                 type="button"
                 phx-click="create-participant"
                 phx-disable-with="Creating..."
-                class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-primary"
+                variant="primary"
+                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase tracking-wide"
               >
                 <.icon name="hero-user-plus-solid" class="size-4" /> Add Participant
-              </button>
+              </.button>
             </:actions>
           </.simple_form>
         </div>

@@ -81,7 +81,7 @@ defmodule MtgFriendsWeb.Layouts do
       </main>
 
       <footer class="border-t border-base-300 bg-base-200/90 py-4">
-        <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-xs font-bold tracking-[0.22em] text-base-content/60 md:flex-row lg:px-6">
+        <div class="mx-auto flex w-full max-w-[1800px] flex-col items-center justify-between gap-4 px-4 text-xs font-bold tracking-wider text-base-content/60 md:flex-row lg:px-6">
           <p class="text-base-content/60 uppercase">
             Version: <span class="font-mono">{@app_version}</span>
           </p>

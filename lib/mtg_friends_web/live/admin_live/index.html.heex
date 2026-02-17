@@ -1,9 +1,9 @@
 <.header class="mb-2">
   Listing Tournaments
   <:actions>
-    <.link patch={~p"/tournaments/new"} class="cta">
+    <.button patch={~p"/tournaments/new"} variant="primary">
       New Tournament
-    </.link>
+    </.button>
     <.link navigate={~p"/admin/games"}>Games portal</.link>
   </:actions>
 </.header>
@@ -11,9 +11,9 @@
 <div id="controls" class="mb-8">
   <p class="font-bold">Filter tournaments</p>
   <div class="mt-2 flex items-center gap-2 justify-center">
-    <.button phx-click="filter-none">all</.button>
-    <.button phx-click="filter-inactive">inactive</.button>
-    <.button phx-click="filter-active">active</.button>
+    <.button phx-click="filter-none" variant="neutral">all</.button>
+    <.button phx-click="filter-inactive" variant="warning">inactive</.button>
+    <.button phx-click="filter-active" variant="success">active</.button>
   </div>
 </div>
 

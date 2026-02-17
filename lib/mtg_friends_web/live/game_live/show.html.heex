@@ -2,9 +2,13 @@
   Game {@game.id}
   <:subtitle>This is a game record from your database.</:subtitle>
   <:actions>
-    <.link patch={~p"/admin/games/#{@game}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit game</.button>
-    </.link>
+    <.button
+      patch={~p"/admin/games/#{@game}/show/edit"}
+      phx-click={JS.push_focus()}
+      variant="primary"
+    >
+      Edit game
+    </.button>
   </:actions>
 </.header>
 
