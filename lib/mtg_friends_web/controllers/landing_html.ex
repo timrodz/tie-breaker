@@ -4,6 +4,8 @@ defmodule MtgFriendsWeb.LandingHTML do
   alias MtgFriends.Tournaments
 
   def index(assigns) do
+    assigns = Map.put(assigns, :features, get_features())
+
     ~H"""
     <div class="min-h-screen tb-page-bg">
       <nav class="sticky top-0 z-50 w-full border-b border-base-300 bg-base-300/80 backdrop-blur-md">
@@ -86,45 +88,31 @@ defmodule MtgFriendsWeb.LandingHTML do
           </div>
 
           <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <article class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50">
-              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-                <.icon name="hero-squares-2x2-solid" class="size-7 text-primary" />
-              </div>
-              <h3 class="mb-3 text-4xl font-bold text-base-content">Multi-Player Pods</h3>
-              <p class="text-xl leading-relaxed text-base-content/70">
-                Advanced support for 3 and 4-player pods. Automatically handles odd player counts and ensures diverse matchups every round.
-              </p>
-              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
-                <.icon name="hero-adjustments-horizontal-solid" class="size-4" /> Custom Pairing Logic
-              </div>
-            </article>
-
-            <article class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50">
-              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-                <.icon name="hero-bolt-solid" class="size-7 text-primary" />
-              </div>
-              <h3 class="mb-3 text-4xl font-bold text-base-content">Instant Standings</h3>
-              <p class="text-xl leading-relaxed text-base-content/70">
-                Lightning-fast results calculation. Players can check their rank and upcoming table assignments via a simple, static URL.
-              </p>
-              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
-                <.icon name="hero-qr-code-solid" class="size-4" /> QR Ready Layouts
-              </div>
-            </article>
-
             <article
-              id="documentation"
+              :for={feature <- @features}
               class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50"
             >
               <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-                <.icon name="hero-command-line-solid" class="size-7 text-primary" />
+                <.icon name={feature.icon} class="size-7 text-primary" />
               </div>
-              <h3 class="mb-3 text-4xl font-bold text-base-content">Robust & Reliable</h3>
+              <h3 class="mb-3 text-4xl font-bold text-base-content">{feature.title}</h3>
               <p class="text-xl leading-relaxed text-base-content/70">
-                Built for reliability. No heavy scripts or 3D assets to crash on mobile. Just clean, server-rendered tournament management.
+                {feature.description}
               </p>
-              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
-                <.icon name="hero-cloud-solid" class="size-4" /> 99.9% Uptime SLA
+              <div class="mt-6 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
+                <p
+                  :if={Map.has_key?(feature, :footer_text)}
+                  class="flex items-center gap-2"
+                >
+                  {feature.footer_text}
+                </p>
+                <.link
+                  :if={Map.has_key?(feature, :href)}
+                  href={feature.href}
+                  class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary hover:text-primary/80"
+                >
+                  Learn More <.icon name="hero-arrow-up-right-solid" class="size-4" />
+                </.link>
               </div>
             </article>
           </div>
@@ -198,5 +186,37 @@ defmodule MtgFriendsWeb.LandingHTML do
       end
 
     "Round #{current_round} of #{total_rounds}"
+  end
+
+  defp get_features do
+    [
+      %{
+        title: "Multi-player Pods",
+        description:
+          "Advanced support for 3 and 4-player pods. Automatically handles odd player counts and ensures diverse matchups every round.",
+        icon: "hero-squares-2x2-solid",
+        footer_text: "EDH 8 player tournaments welcome",
+      },
+      %{
+        title: "Instant Standings",
+        description:
+          "Lightning-fast results calculation. Players can check their rank and upcoming table assignments via QR code.",
+        icon: "hero-qr-code-solid",
+        footer_text: "QR Ready Layouts",
+      },
+      %{
+        title: "Diverse Algorithms",
+        description:
+          "Choose from Round Robin, Bubble Rounds, or Swiss for your pod match-ups. Change any-time even if your tournament is live.",
+        icon: "hero-users-solid",
+        footer_text: "Custom Pairing Logic",
+      },
+      # %{
+      #   title: "Open Source",
+      #   description: "Built for reliability. Open sourced, Tie Breaker gives to the community a product they can fully own, completely free.",
+      #   icon: "hero-code-bracket-square-solid",
+      #   href: "https://github.com/timrodz/mtg-friends"
+      # }
+    ]
   end
 end
