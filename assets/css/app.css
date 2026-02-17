@@ -29,7 +29,7 @@
     --color-base-100: oklch(28.822% 0.022 277.508);
     --color-base-200: oklch(26.805% 0.02 277.508);
     --color-base-300: oklch(24.787% 0.019 277.508);
-    --color-base-content: oklch(97.747% 0.007 106.545);
+    --color-base-content: oklch(100% 0.01 106.545);
     --color-primary: oklch(67% 0.182 276.935);
     --color-primary-content: oklch(25% 0.09 281.288);
     --color-secondary: oklch(70% 0.04 256.788);
@@ -199,4 +199,8 @@ button {
 
 select {
     @apply hover:cursor-pointer;
+}
+
+.participant-form-input {
+    @apply w-full rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-sm outline-none ring-0 transition-colors focus:border-primary font-mono;
 }

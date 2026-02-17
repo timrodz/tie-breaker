@@ -68,7 +68,7 @@ defmodule MtgFriendsWeb.LandingHTML do
             </div>
           </div>
           <.live_tournaments />
-          <div class="ml-2 mt-2">
+          <div class="ml-2 mt-4">
             <.link
               navigate={~p"/tournaments"}
               class="inline-flex items-center gap-1 text-md bg-base-300 font-bold uppercase tracking-widest text-primary hover:text-primary"

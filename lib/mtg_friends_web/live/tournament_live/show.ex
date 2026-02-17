@@ -75,7 +75,7 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
      |> UserAuth.assign_current_user_owner(current_user, tournament)
      |> UserAuth.assign_current_user_admin(socket.assigns.current_user)
      |> assign(:has_winner?, not is_nil(winner))
-     |> assign(:page_title, page_title(live_action, tournament.name))
+     |> assign(:page_title, page_title(live_action, tournament.name |> String.capitalize()))
      |> assign(:tournament, tournament)
      |> assign(:tournament_public_url, tournament_public_url)
      |> assign(:tournament_qr_svg, QR.svg(tournament_public_url))

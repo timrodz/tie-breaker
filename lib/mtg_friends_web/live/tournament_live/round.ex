@@ -80,6 +80,8 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       :timer.cancel(ref)
     end
 
+    tournament_name = round.tournament.name |> String.capitalize()
+
     socket
     |> assign(
       timer_reference:
@@ -104,10 +106,10 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       page_title:
         case action do
           :index ->
-            "#{round.tournament.name} / Round #{round.number + 1}"
+            "#{tournament_name} / Round #{round.number + 1}"
 
           :edit ->
-            "#{round.tournament.name} / Round #{round.number + 1} / Edit Pairing"
+            "#{tournament_name} / Round #{round.number + 1} / Edit Pairing"
         end,
       # num_pairings logic was just for display, now we have explicit pairings
       forms: forms

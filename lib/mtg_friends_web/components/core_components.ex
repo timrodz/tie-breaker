@@ -293,7 +293,7 @@ defmodule MtgFriendsWeb.CoreComponents do
       "success" =>
         "border-success/50 bg-success/10 text-success hover:border-success hover:bg-success/20",
       "warning" =>
-        "border-warning/50 bg-warning/20 text-warning hover:border-warning hover:bg-warning/30",
+        "border-warning/50 bg-warning/10 text-warning hover:border-warning hover:bg-warning/20",
       "error" => "border-error/50 bg-error/20 text-error hover:border-error hover:bg-error/30",
       "info" => "border-info/50 bg-info/20 text-info hover:border-info hover:bg-info/30",
       "ghost" =>

@@ -19,9 +19,9 @@
       </div>
     </nav>
 
-    <main class="flex flex-col gap-8 xl:flex-row">
-      <aside class="w-full xl:w-72">
-        <div class="space-y-4 xl:sticky xl:top-28">
+    <main class="flex flex-col gap-8 lg:flex-row">
+      <aside class="w-full lg:w-72">
+        <div class="space-y-4 lg:sticky lg:top-28">
           <.button
             :if={@current_user_owner and @can_start_new_round?}
             id="start-new-round-button"
@@ -47,7 +47,12 @@
           >
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-2xl font-bold tracking-tight">Round {round.number + 1}</p>
+                <p class={[
+                  "text-2xl font-bold tracking-tight",
+                  round.number == @round_number && "text-primary"
+                ]}>
+                  Round {round.number + 1}
+                </p>
                 <p class="mt-1 text-xs font-bold uppercase tracking-wider text-base-content/70">
                   {String.upcase(to_string(round.status))}
                 </p>

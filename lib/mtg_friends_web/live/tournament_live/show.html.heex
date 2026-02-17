@@ -155,7 +155,7 @@
               :for={{p, index} <- Enum.with_index(@participant_forms.params["participants"])}
               id={"form-participant-#{p["id"]}"}
               class={[
-                "tb-panel rounded-2xl border p-4",
+                "tb-panel-strong rounded-2xl border p-4",
                 p["is_dropped"] && "border-error/30 bg-error/10",
                 not p["is_dropped"] && "border-base-300/60 bg-base-300/60"
               ]}
@@ -165,8 +165,13 @@
                   <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-base-200 px-2 py-1 text-xs font-bold text-base-content/80">
                     #{index + 1}
                   </span>
-                  <p class="text-lg font-bold text-base-content">
+                  <p class="text-lg font-bold text-base-content inline-flex items-center gap-1">
                     {p["name"] || "Unnamed Participant"}
+                    <.icon
+                      :if={p["is_tournament_winner"]}
+                      name="hero-trophy-solid"
+                      class="size-4 text-success"
+                    />
                   </p>
                 </div>
                 <p class="text-right text-sm font-semibold text-primary">
@@ -187,8 +192,8 @@
                     type="text"
                     name={"form-participant-name-#{p["id"]}"}
                     value={p["name"]}
-                    class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
-                    placeholder="Participant name"
+                    class="participant-form-input"
+                    placeholder="Richard Garfield..."
                   />
                 </label>
 
@@ -200,8 +205,8 @@
                     type="url"
                     name={"form-participant-decklist-#{p["id"]}"}
                     value={p["decklist"]}
-                    class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
-                    placeholder="Decklist URL"
+                    class="participant-form-input"
+                    placeholder="https://moxfield.com/..."
                   />
                 </label>
               </div>
@@ -216,9 +221,9 @@
                     |> hide("##{p["id"]}")
                   }
                   data-confirm={"Are you sure? You're about to remove #{p["name"]} from the tournament."}
-                  class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-error"
+                  class="inline-flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-error"
                 >
-                  <.icon name="hero-trash-solid" class="size-4" /> Remove
+                  <.icon name="hero-trash-solid" class="size-4" /> Remove from tournament
                 </.link>
               </div>
             </div>
