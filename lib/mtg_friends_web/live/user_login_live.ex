@@ -6,7 +6,7 @@ defmodule MtgFriendsWeb.UserLoginLive do
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-sm">
-      <.header class="text-center">
+      <.header class="text-center mt-10">
         Sign in to account
         <:subtitle>
           Don't have an account?
@@ -34,7 +34,7 @@ defmodule MtgFriendsWeb.UserLoginLive do
           </.link>
         </:actions>
         <:actions>
-          <.button phx-disable-with="Signing in..." class="btn btn-primary w-full">
+          <.button phx-disable-with="Signing in..." variant="primary" class="w-full">
             Sign in <span aria-hidden="true">→</span>
           </.button>
         </:actions>

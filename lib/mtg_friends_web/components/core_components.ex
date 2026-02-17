@@ -246,35 +246,63 @@ defmodule MtgFriendsWeb.CoreComponents do
       <.button phx-click="go" variant="primary">Send!</.button>
       <.button navigate={~p"/"}>Home</.button>
   """
+  attr :class, :string, default: nil
   attr :rest, :global, include: ~w(href navigate patch disabled)
-  attr :variant, :string, values: ~w(primary secondary accent accent-soft accent-outline)
+
+  attr :variant, :string,
+    values: ~w(primary secondary neutral success warning error info ghost soft outline)
+
   slot :inner_block, required: true
 
   def button(%{rest: rest} = assigns) do
-    variants = %{
-      "primary" => "btn-primary",
-      "secondary" => "btn-secondary",
-      "accent" => "btn-accent",
-      "accent-soft" => "btn-accent btn-soft",
-      "accent-outline" => "btn-accent btn-outline",
-      nil => "btn-primary btn-soft"
-    }
-
-    assigns = assign(assigns, :class, Map.fetch!(variants, assigns[:variant]))
+    assigns =
+      assigns
+      |> assign(:variant_class, variant_classes(assigns[:variant]))
+      |> assign(
+        :base_class,
+        "btn border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+      )
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
       ~H"""
-      <.link class={["btn", @class]} {@rest}>
+      <.link class={[@base_class, @variant_class, @class]} {@rest}>
         {render_slot(@inner_block)}
       </.link>
       """
     else
       ~H"""
-      <button class={["btn", @class]} {@rest}>
+      <button class={[@base_class, @variant_class, @class]} {@rest}>
         {render_slot(@inner_block)}
       </button>
       """
     end
+  end
+
+  defp variant_classes(variant) do
+    variants = %{
+      "primary" =>
+        "border-primary/50 bg-primary/20 text-primary hover:border-primary hover:bg-primary/30",
+      "secondary" =>
+        "border-secondary/50 bg-secondary/20 text-secondary hover:border-secondary hover:bg-secondary/30",
+      "neutral" =>
+        "border-neutral/50 bg-neutral/20 text-neutral hover:border-neutral hover:bg-neutral/30",
+      "success" =>
+        "border-success/50 bg-success/20 text-success hover:border-success hover:bg-success/30",
+      "warning" =>
+        "border-warning/50 bg-warning/20 text-warning hover:border-warning hover:bg-warning/30",
+      "error" => "border-error/50 bg-error/20 text-error hover:border-error hover:bg-error/30",
+      "info" => "border-info/50 bg-info/20 text-info hover:border-info hover:bg-info/30",
+      "ghost" =>
+        "border-transparent bg-transparent text-primary hover:border-primary/30 hover:bg-primary/10",
+      "soft" =>
+        "border-primary/40 bg-primary/15 text-primary hover:border-primary/60 hover:bg-primary/25",
+      "outline" =>
+        "border-primary/60 bg-transparent text-primary hover:border-primary hover:bg-primary/10",
+      nil =>
+        "border-primary/50 bg-primary/20 text-primary hover:border-primary hover:bg-primary/30"
+    }
+
+    Map.fetch!(variants, variant)
   end
 
   @doc """
@@ -444,13 +472,10 @@ defmodule MtgFriendsWeb.CoreComponents do
 
   def warning(assigns) do
     ~H"""
-    <p class={
-      [
-        # "mt-3 flex gap-3 text-sm leading-6 rounded-md p-2 font-medium bg-yellow-200 phx-no-feedback:hidden",
-        "alert alert-warning",
-        @class
-      ]
-    }>
+    <p class={[
+      "alert alert-warning",
+      @class
+    ]}>
       <.icon name="hero-exclamation-triangle" class="mt-0.5 flex-none" />
       {render_slot(@inner_block)}
     </p>
@@ -529,27 +554,27 @@ defmodule MtgFriendsWeb.CoreComponents do
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          class="relative divide-y divide-base-300 border-t border-base-300 text-sm leading-6 text-base-content/80"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-100">
+          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-base-200">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
               class={["relative p-0", @row_click && "hover:cursor-pointer"]}
             >
               <div class="block py-4 pr-6">
-                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-base-100 sm:rounded-l-xl" />
+                <span class={["relative", i == 0 && "font-semibold text-base-content"]}>
                   {render_slot(col, @row_item.(row))}
                 </span>
               </div>
             </td>
             <td :if={@action != []} class="relative w-14 p-0">
               <div class="whitespace-nowrap py-4 text-right text-sm font-medium">
-                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
+                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-base-100 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
-                  class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  class="relative ml-4 font-semibold leading-6 text-base-content hover:text-base-content/70"
                 >
                   {render_slot(action, @row_item.(row))}
                 </span>

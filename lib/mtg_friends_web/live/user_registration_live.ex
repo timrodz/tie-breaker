@@ -36,7 +36,7 @@ defmodule MtgFriendsWeb.UserRegistrationLive do
         <.input field={@form[:password]} type="password" label="Password" required />
 
         <:actions>
-          <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
+          <.button phx-disable-with="Creating account..." variant="primary" class="w-full">
             Create an account
           </.button>
         </:actions>

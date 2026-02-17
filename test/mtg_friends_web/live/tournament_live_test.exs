@@ -4,6 +4,10 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
   import Phoenix.LiveViewTest
   import MtgFriends.TournamentsFixtures
   import MtgFriends.AccountsFixtures
+  import MtgFriends.ParticipantsFixtures
+
+  alias MtgFriends.Rounds
+  alias MtgFriends.Tournaments
 
   # @create_attrs %{
   #   name: "Test Tournament Name",
@@ -31,7 +35,7 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
     test "lists all tournaments", %{conn: conn, tournament: tournament} do
       {:ok, _index_live, html} = live(conn, ~p"/tournaments")
 
-      assert html =~ "Tournaments"
+      assert html =~ "Discover your new battleground"
       assert html =~ tournament.location
     end
 
@@ -41,7 +45,7 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
 
       {:ok, index_live, _html} = live(conn, ~p"/tournaments")
 
-      index_live |> element("a", "Create new tournament") |> render_click()
+      index_live |> element("a", "Create Tournament") |> render_click()
 
       assert_patch(index_live, ~p"/tournaments/new")
     end
@@ -88,6 +92,52 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
       show_live |> element("a", "Edit") |> render_click()
 
       assert_patch(show_live, ~p"/tournaments/#{tournament}/show/edit")
+    end
+  end
+
+  describe "Round" do
+    test "shows start new round button when all rounds are finished and rounds remain" do
+      user = user_fixture()
+      tournament = tournament_fixture(%{user: user, round_count: 2})
+
+      for idx <- 1..4 do
+        participant_fixture(%{tournament: tournament, name: "Player #{idx}"})
+      end
+
+      tournament = Tournaments.get_tournament!(tournament.id)
+      {:ok, first_round} = Rounds.start_round(tournament)
+      {:ok, _} = Rounds.update_round(first_round, %{status: :finished})
+
+      conn = log_in_user(build_conn(), user)
+      {:ok, view, _html} = live(conn, ~p"/tournaments/#{tournament.id}/rounds/1")
+
+      assert has_element?(view, "#start-new-round-button")
+      refute has_element?(view, "#start-new-round-button[disabled]")
+    end
+
+    test "creates next round from round page" do
+      user = user_fixture()
+      tournament = tournament_fixture(%{user: user, round_count: 2})
+
+      for idx <- 1..4 do
+        participant_fixture(%{tournament: tournament, name: "Player #{idx}"})
+      end
+
+      tournament = Tournaments.get_tournament!(tournament.id)
+      {:ok, first_round} = Rounds.start_round(tournament)
+      {:ok, _} = Rounds.update_round(first_round, %{status: :finished})
+      conn = log_in_user(build_conn(), user)
+      {:ok, view, _html} = live(conn, ~p"/tournaments/#{tournament.id}/rounds/1")
+
+      view
+      |> element("#start-new-round-button")
+      |> render_click()
+
+      assert_redirect(view, ~p"/tournaments/#{tournament.id}/rounds/2")
+
+      rounds = Rounds.list_rounds(tournament.id)
+      assert length(rounds) == 2
+      assert Enum.any?(rounds, fn round -> round.number == 1 and round.status == :active end)
     end
   end
 end

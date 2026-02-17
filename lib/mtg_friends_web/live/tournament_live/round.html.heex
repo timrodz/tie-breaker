@@ -1,77 +1,215 @@
-<.header class="mb-4">
-  {@tournament_name}
-  <:subtitle>
-    Round #{@round_number + 1} / <.round_status value={@round_status} />
-  </:subtitle>
-</.header>
-
-<%= if @round_status == :active do %>
-  <section id="timer">
-    <.round_timer
-      seconds_left={@round_countdown_timer |> elem(0)}
-      time_left={@round_countdown_timer |> elem(1)}
-    />
-  </section>
-<% end %>
-<%= if @current_user_owner and @round_status == :inactive do %>
-  <div class="alert border-base-300 alert-vertical py-6">
-    <p>
-      🎉 This round's pods have been generated!<br />Let players know who they'll be playing against.
-    </p>
-    <p>When all players are ready, click on <b>Start round</b> below.</p>
-    <.button phx-click="start-round" phx-disable-with="Starting..." variant="primary">
-      <.icon name="hero-rocket-launch-solid" />Start round
-    </.button>
-  </div>
-<% end %>
-
-<section id="pairings">
-  <h2>Pairings</h2>
-  <.item_grid id="pairing" items={@pairings}>
-    <:item :let={{pairing, index}} class="justify-between">
-      <div>
-        <h3 class="font-semibold">
-          Pod #{index} — {(@round_status == :inactive && "Waiting for start") ||
-            (pairing.active && "In progress") ||
-            "Finished"}
-        </h3>
-        <div
-          :for={pp <- Enum.sort_by(pairing.pairing_participants, fn p -> p.points end, :desc)}
-          id={"tournament-#{@tournament_id}-round-#{@round_id}-pairing-#{pairing.id}-participant-#{pp.participant.id}"}
-          class={[
-            "flex justify-between items-center gap-2 py-1 px-2 rounded-md",
-            (pairing.winner_id == pp.participant_id && "font-bold bg-success text-success-content") ||
-              ""
-          ]}
+<div class="min-h-screen tb-page-bg text-base-content">
+  <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
+    <nav class="mb-8">
+      <div class="tb-panel-strong inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
+        <.button
+          navigate={~p"/tournaments/#{@tournament_id}"}
+          variant="neutral"
+          class="px-8 py-3 text-sm font-bold uppercase tracking-widest"
         >
-          <p class="flex gap-1 items-center">
-            {pp.participant.name}
-            <.icon :if={pairing.winner_id == pp.participant_id} name="hero-trophy" />
-          </p>
-          <p>
-            Points: {pp.points}
+          Overview
+        </.button>
+        <.button
+          navigate={~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}"}
+          variant="primary"
+          class="px-8 py-3 text-sm font-bold uppercase tracking-widest"
+        >
+          Round Information
+        </.button>
+      </div>
+    </nav>
+
+    <main class="flex flex-col gap-8 xl:flex-row">
+      <aside class="w-full xl:w-72">
+        <div class="space-y-4 xl:sticky xl:top-28">
+          <.button
+            :if={@current_user_owner and @can_start_new_round?}
+            id="start-new-round-button"
+            type="button"
+            phx-click="create-round"
+            disabled={!@can_start_new_round?}
+            phx-disable-with="Starting..."
+            variant="primary"
+            class="w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase tracking-wide"
+          >
+            <.icon name="hero-plus-solid" class="size-4" /> Start New Round
+          </.button>
+          <.link
+            :for={round <- Enum.sort_by(@tournament_rounds, & &1.number, :desc)}
+            navigate={~p"/tournaments/#{@tournament_id}/rounds/#{round.number + 1}"}
+            class={[
+              "block w-full rounded-xl border px-6 py-4 transition-all",
+              round.number == @round_number &&
+                "border-primary bg-primary/30 text-base-content ring-1 ring-primary/30",
+              round.number != @round_number &&
+                "border-base-300/70 bg-base-200 text-base-content/85 hover:border-primary/50"
+            ]}
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-2xl font-bold tracking-tight">Round {round.number + 1}</p>
+                <p class="mt-1 text-xs font-bold uppercase tracking-wider text-base-content/70">
+                  {String.upcase(to_string(round.status))}
+                </p>
+              </div>
+              <.icon
+                name="hero-clock-solid"
+                class={
+                            "size-4 #{if round.number == @round_number, do: "text-primary", else: "text-base-content/60"}"
+                        }
+              />
+            </div>
+          </.link>
+        </div>
+      </aside>
+
+      <section class="min-w-0 flex-1 space-y-8">
+        <div class="tb-panel-strong rounded-2xl p-6 lg:p-8">
+          <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 class="text-3xl font-black tracking-tight text-base-content">
+                Round {@round_number + 1} Pairings
+              </h2>
+              <div class="mt-2 flex flex-wrap items-center gap-3 text-sm text-base-content/70">
+                <span class="inline-flex items-center gap-1">
+                  <.icon name="hero-information-circle-solid" class="size-4" />
+                  {case @round_status do
+                    :active -> "Active"
+                    :finished -> "Finished"
+                    status -> status
+                  end}
+                </span>
+                <span class="h-1 w-1 rounded-2xl bg-base-content/40"></span>
+                <span class="inline-flex items-center gap-1">
+                  <.icon name="hero-squares-2x2-solid" class="size-4" /> {length(@pairings)} Pods
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-6 rounded-xl border border-base-300 bg-base-300/40 px-4 py-3">
+              <div class="text-right">
+                <p class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+                  Pods
+                </p>
+                <p class="text-2xl font-black text-base-content">{length(@pairings)}</p>
+              </div>
+              <div :if={@round_status == :active} class="h-8 w-px bg-base-content/30"></div>
+              <div :if={@round_status == :active} class="text-right">
+                <p class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+                  Time Remaining
+                </p>
+                <p class="text-2xl font-black text-primary">{elem(@round_countdown_timer, 1)}</p>
+              </div>
+            </div>
+          </div>
+          <div
+            :if={@current_user_owner and @round_status == :inactive}
+            class="mt-5 rounded-2xl border border-success/30 bg-success/10 p-4"
+          >
+            <p class="mb-3 text-sm text-success-content">
+              This round's pods are generated and ready to start.
+            </p>
+            <.button
+              type="button"
+              phx-click="start-round"
+              phx-disable-with="Starting..."
+              variant="success"
+              class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase tracking-wide"
+            >
+              <.icon name="hero-rocket-launch-solid" class="size-4" /> Start Round
+            </.button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
+          <article
+            :for={{pairing, pairing_index} <- @pairings |> Enum.with_index()}
+            class="tb-panel-strong rounded-xl border border-base-300/70 bg-base-200/45 p-6 transition-colors"
+          >
+            <div class="mb-5 border-b border-base-300/60 pb-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-5xl font-black tracking-tight text-primary/90">
+                    {(pairing_index + 1) |> Integer.to_string() |> String.pad_leading(2, "0")}
+                  </p>
+                  <p class="text-xs font-bold uppercase tracking-widest text-base-content/60">
+                    Pod
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs font-bold uppercase tracking-widest text-base-content/60">
+                    Status
+                  </p>
+                  <p class={[
+                    "mt-1 inline-flex rounded-2xl px-2 py-1 text-xs font-bold",
+                    @round_status == :inactive && "bg-base-200/70 text-base-content/85",
+                    @round_status != :inactive && pairing.active &&
+                      "bg-warning/20 text-warning",
+                    @round_status != :inactive && not pairing.active &&
+                      "bg-success/20 text-success"
+                  ]}>
+                    {if @round_status == :inactive,
+                      do: "Waiting",
+                      else: if(pairing.active, do: "Playing", else: "Finished")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div
+                :for={
+                  pp <- Enum.sort_by(pairing.pairing_participants, fn p -> p.points end, :desc)
+                }
+                id={"tournament-#{@tournament_id}-round-#{@round_id}-pairing-#{pairing.id}-participant-#{pp.participant.id}"}
+                class={[
+                  "flex items-center justify-between rounded-2xl px-3 py-2",
+                  pairing.winner_id == pp.participant_id &&
+                    "border border-success/40 bg-success/15",
+                  pairing.winner_id != pp.participant_id && "text-base-content/80"
+                ]}
+              >
+                <p class={[
+                  "text-xl font-semibold tracking-tight",
+                  pairing.winner_id == pp.participant_id && "text-base-content",
+                  pairing.winner_id != pp.participant_id && "text-base-content/80"
+                ]}>
+                  {pp.participant.name}
+                </p>
+                <p class={[
+                  "text-xl font-black",
+                  pairing.winner_id == pp.participant_id && "text-success",
+                  pairing.winner_id != pp.participant_id && "text-base-content/80"
+                ]}>
+                  {pp.points} pts
+                </p>
+              </div>
+            </div>
+
+            <.button
+              :if={@current_user_owner && @round_status != :inactive}
+              patch={
+                ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
+              }
+              phx-click={JS.push_focus()}
+              variant={if pairing.active, do: "primary", else: "warning"}
+              class="mt-4 gap-2 font-bold uppercase"
+            >
+              <.icon name="hero-pencil-square-solid" class="size-4" />
+              {if pairing.active, do: "Assign Pod Results", else: "Update Pod Results"}
+            </.button>
+          </article>
+        </div>
+
+        <div class="py-12 text-center">
+          <div class="mx-auto mb-4 h-px w-24 bg-base-content/30"></div>
+          <p class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+            End of round {@round_number + 1} pod list
           </p>
         </div>
-      </div>
-      <div>
-        <.link
-          :if={@current_user_owner && @round_status != :inactive}
-          patch={
-            ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
-          }
-          phx-click={JS.push_focus()}
-          class="self-start btn btn-primary"
-        >
-          <%= if pairing.active do %>
-            Assign pod results
-          <% else %>
-            Update pod results
-          <% end %>
-        </.link>
-      </div>
-    </:item>
-  </.item_grid>
-</section>
+      </section>
+    </main>
+  </div>
+</div>
 
 <.modal
   :if={@live_action == :edit}
@@ -91,5 +229,3 @@
     navigate={~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}"}
   />
 </.modal>
-
-<.back navigate={~p"/tournaments/#{@tournament_id}"}>Tournament</.back>

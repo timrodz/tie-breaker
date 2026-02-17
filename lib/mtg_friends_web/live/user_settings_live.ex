@@ -28,7 +28,7 @@ defmodule MtgFriendsWeb.UserSettingsLive do
           required
         />
         <:actions>
-          <.button phx-disable-with="Changing..." class="btn btn-neutral">Change Email</.button>
+          <.button phx-disable-with="Changing..." variant="neutral">Change Email</.button>
         </:actions>
       </.simple_form>
     </div>
@@ -65,7 +65,7 @@ defmodule MtgFriendsWeb.UserSettingsLive do
           required
         />
         <:actions>
-          <.button phx-disable-with="Changing..." class="btn btn-neutral">Change Password</.button>
+          <.button phx-disable-with="Changing..." variant="neutral">Change Password</.button>
         </:actions>
       </.simple_form>
     </div>

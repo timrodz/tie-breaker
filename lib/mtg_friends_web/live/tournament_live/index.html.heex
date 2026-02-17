@@ -1,54 +1,145 @@
-<.header>
-  Tournaments
-  <:actions>
-    <%= if @current_user do %>
-      <.link class="btn btn-accent" patch={~p"/tournaments/new"}>
-        <.icon name="hero-rocket-launch-solid" /> Create new tournament
-      </.link>
-    <% end %>
-  </:actions>
-</.header>
+<div class="min-h-screen tb-page-bg text-base-content">
+  <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
+    <section class="tb-panel-strong mb-8 rounded-2xl p-6 lg:p-8">
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div class="space-y-2">
+          <h1 class="text-4xl font-black text-base-content uppercase">
+            Discover your new battleground
+          </h1>
+          <p class="text-lg text-base-content/70">
+            Find tournaments, filter by format and status, and jump into their pages.
+          </p>
+        </div>
+        <.button
+          patch={~p"/tournaments/new"}
+          variant="soft"
+          class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wider"
+        >
+          <.icon name="hero-plus-solid" class="size-4" /> Create Tournament
+        </.button>
+      </div>
 
-<.item_grid
-  id="tournaments"
-  items={@streams.tournaments}
->
-  <:item :let={{_id, t}} class="flex flex-col justify-between gap-2">
-    <h3 class="text-accent truncate font-semibold !m-0">{t.name}</h3>
-    <p class="game-name">{t.game.name}</p>
-    <.date dt={t.date} />
-    <h4 class="icon-text truncate">
-      <.icon name="hero-map-pin-solid" /> {t.location}
-    </h4>
-    <.tournament_status value={t.status} />
-    <.button href={~p"/tournaments/#{t.id}"}>
-      <.icon name="hero-globe-alt" /> View tournament
-    </.button>
-  </:item>
-</.item_grid>
+      <form
+        id="tournament-filters"
+        phx-change="filter"
+        class="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-12"
+      >
+        <label class="lg:col-span-7">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-wider text-base-content/60">
+            Search
+          </span>
+          <span class="flex items-center rounded-xl border border-base-300 bg-base-200/80 px-3 transition-colors focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/40">
+            <.icon name="hero-magnifying-glass" class="mr-2 size-4 text-base-content/60" />
+            <input
+              id="tournament-search"
+              name="search"
+              value={@search}
+              type="text"
+              phx-debounce="300"
+              autocomplete="off"
+              placeholder="Search by tournament name..."
+              class="h-11 w-full border-none bg-transparent p-0 text-sm text-base-content placeholder:text-base-content/60 focus:outline-none focus:ring-0"
+            />
+          </span>
+        </label>
 
-<div id="pagination" class="flex items-center gap-1">
-  <.link
-    :if={@has_previous_page?}
-    class="btn btn-primary btn-soft"
-    navigate={~p"/tournaments?page=#{@page - 1}"}
-  >
-    <.icon name="hero-chevron-left" /> Previous page
-  </.link>
-  <.link
-    :if={@has_next_page?}
-    class="btn btn-primary btn-soft"
-    navigate={~p"/tournaments?page=#{@page + 1}"}
-  >
-    Next page <.icon name="hero-chevron-right" />
-  </.link>
+        <label class="lg:col-span-2">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-wider text-base-content/60">
+            Format
+          </span>
+          <select
+            id="filter-format"
+            name="format"
+            class="h-11 w-full rounded-xl border border-base-300 bg-base-200/80 px-3 text-sm text-base-content outline-none focus:border-primary"
+          >
+            <option value="">All Formats</option>
+            <option value="edh" selected={@filter_format == "edh"}>EDH</option>
+            <option value="standard" selected={@filter_format == "standard"}>Standard</option>
+          </select>
+        </label>
+
+        <label class="lg:col-span-3">
+          <span class="mb-1 block text-xs font-bold uppercase tracking-wider text-base-content/60">
+            Status
+          </span>
+          <select
+            id="filter-status"
+            name="status"
+            class="h-11 w-full rounded-xl border border-base-300 bg-base-200/80 px-3 text-sm text-base-content outline-none focus:border-primary"
+          >
+            <option value="">All Statuses</option>
+            <option value="active" selected={@filter_status == "active"}>Active</option>
+            <option value="inactive" selected={@filter_status == "inactive"}>Inactive</option>
+            <option value="finished" selected={@filter_status == "finished"}>Finished</option>
+          </select>
+        </label>
+      </form>
+    </section>
+
+    <section>
+      <div
+        id="tournaments"
+        phx-update="stream"
+        class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"
+      >
+        <div
+          id="tournaments-empty-state"
+          class="hidden only:block rounded-2xl border border-base-300 bg-base-200/70 p-6 text-sm text-base-content/70"
+        >
+          No tournaments found with your current filters.
+        </div>
+
+        <.tournament_card
+          :for={{dom_id, t} <- @streams.tournaments}
+          id={dom_id}
+          class="h-full"
+          tournament={t}
+          navigate_to={~p"/tournaments/#{t.id}"}
+          cta_label="View tournament"
+          show_format={true}
+          show_edit={@current_user && @current_user.id == t.user_id}
+          edit_patch={~p"/tournaments/#{t.id}/edit"}
+        />
+      </div>
+    </section>
+
+    <div id="pagination" class="mt-10 flex justify-center">
+      <div class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/70 p-2">
+        <.button
+          :if={@has_previous_page?}
+          navigate={
+            ~p"/tournaments?page=#{@page - 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
+          }
+          variant="neutral"
+          class="btn-square btn-sm"
+        >
+          <.icon name="hero-chevron-left" class="size-4" />
+        </.button>
+
+        <span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/20 text-sm font-bold text-primary">
+          {@page}
+        </span>
+
+        <.button
+          :if={@has_next_page?}
+          navigate={
+            ~p"/tournaments?page=#{@page + 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
+          }
+          variant="neutral"
+          class="btn-square btn-sm"
+        >
+          <.icon name="hero-chevron-right" class="size-4" />
+        </.button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <.modal
   :if={@live_action in [:new, :edit]}
   id="tournament-modal"
   show
-  on_cancel={JS.navigate(~p"/tournaments")}
+  on_cancel={JS.patch(~p"/tournaments")}
 >
   <.live_component
     module={MtgFriendsWeb.TournamentLive.TournamentEditFormComponent}

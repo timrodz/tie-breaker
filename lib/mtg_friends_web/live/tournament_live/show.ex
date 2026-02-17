@@ -1,11 +1,11 @@
 defmodule MtgFriendsWeb.TournamentLive.Show do
   use MtgFriendsWeb, :live_view
 
-  alias MtgFriends.TournamentRenderer
-  alias MtgFriendsWeb.UserAuth
-  alias MtgFriends.Tournaments
   alias MtgFriends.Participants
   alias MtgFriends.Rounds
+  alias MtgFriends.Tournaments
+  alias MtgFriends.Utils.Date
+  alias MtgFriendsWeb.UserAuth
 
   on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
 
@@ -63,35 +63,41 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
 
     %{current_user: current_user, live_action: live_action} = socket.assigns
 
-    {
-      :noreply,
-      socket
-      |> UserAuth.assign_current_user_owner(current_user, tournament)
-      |> UserAuth.assign_current_user_admin(socket.assigns.current_user)
-      |> assign(:has_winner?, not is_nil(winner))
-      |> assign(:page_title, page_title(live_action, tournament.name))
-      |> assign(:tournament, tournament)
-      |> assign(:rounds, tournament.rounds)
-      |> assign(
-        :is_current_round_active?,
-        with len <- length(tournament.rounds), true <- len > 0 do
-          round = Enum.at(tournament.rounds, len - 1)
-          status = Map.get(round, :status)
-          status != :finished
-        else
-          _ -> false
-        end
-      )
-      |> assign(
-        :all_participants_have_names?,
-        Enum.all?(tournament.participants, fn p -> not is_nil(p.name) end)
-      )
-      |> assign(
-        :has_enough_participants?,
-        Tournaments.has_enough_participants?(tournament)
-      )
-      |> assign(:participant_forms, participant_forms)
-    }
+    rounds_desc = Enum.sort_by(tournament.rounds, & &1.number, :desc)
+    active_round = Enum.find(tournament.rounds, fn round -> round.status == :active end)
+    latest_round = List.first(rounds_desc)
+
+    {:noreply,
+     socket
+     |> UserAuth.assign_current_user_owner(current_user, tournament)
+     |> UserAuth.assign_current_user_admin(socket.assigns.current_user)
+     |> assign(:has_winner?, not is_nil(winner))
+     |> assign(:page_title, page_title(live_action, tournament.name))
+     |> assign(:tournament, tournament)
+     |> assign(:rounds, tournament.rounds)
+     |> assign(:rounds_desc, rounds_desc)
+     |> assign(:active_round, active_round)
+     |> assign(:latest_round, latest_round)
+     |> assign(:time_remaining, active_round_time_remaining(active_round, tournament))
+     |> assign(
+       :is_current_round_active?,
+       with len <- length(tournament.rounds), true <- len > 0 do
+         round = Enum.at(tournament.rounds, len - 1)
+         status = Map.get(round, :status)
+         status != :finished
+       else
+         _ -> false
+       end
+     )
+     |> assign(
+       :all_participants_have_names?,
+       Enum.all?(tournament.participants, fn p -> not is_nil(p.name) end)
+     )
+     |> assign(
+       :has_enough_participants?,
+       Tournaments.has_enough_participants?(tournament)
+     )
+     |> assign(:participant_forms, participant_forms)}
   end
 
   defp page_title(:show, tournament_name), do: "#{tournament_name}"
@@ -189,5 +195,24 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
 
   defp reload_page(socket) do
     socket |> push_navigate(to: ~p"/tournaments/#{socket.assigns.tournament.id}", replace: true)
+  end
+
+  defp active_round_time_remaining(nil, _tournament), do: "--:--"
+
+  defp active_round_time_remaining(round, tournament) do
+    case round.started_at do
+      nil ->
+        "--:--"
+
+      started_at ->
+        finish_time = NaiveDateTime.add(started_at, tournament.round_length_minutes, :minute)
+        seconds_left = NaiveDateTime.diff(finish_time, NaiveDateTime.utc_now())
+
+        if seconds_left > 0 do
+          Date.to_hh_mm_ss(seconds_left)
+        else
+          "00:00"
+        end
+    end
   end
 end

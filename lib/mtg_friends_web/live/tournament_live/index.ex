@@ -6,22 +6,27 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
 
   on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
 
+  @limit 6
+
   @impl true
   def mount(params, _session, socket) do
-    page_str = params |> Map.get("page", "1")
-    {page, ""} = Integer.parse(page_str)
-    limit = 6
-    offset = limit * (page - 1)
-    count = Tournaments.get_tournament_count()
-    has_next_page? = count > limit * page
-    has_previous_page? = offset > 0
+    page = parse_page(params)
+    filters = build_filters(params, page)
 
-    tournaments = Tournaments.list_tournaments_paginated(limit, page)
+    count = Tournaments.count_tournaments_filtered(filters)
+    tournaments = Tournaments.list_tournaments_filtered(filters)
 
     {:ok,
      socket
      |> stream(:tournaments, tournaments)
-     |> assign(page: page, has_next_page?: has_next_page?, has_previous_page?: has_previous_page?)}
+     |> assign(
+       page: page,
+       has_next_page?: count > @limit * page,
+       has_previous_page?: page > 1,
+       search: Map.get(params, "search", ""),
+       filter_format: Map.get(params, "format", ""),
+       filter_status: Map.get(params, "status", "")
+     )}
   end
 
   @impl true
@@ -65,25 +70,42 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
     {:noreply, stream_delete(socket, :tournaments, tournament)}
   end
 
-  def handle_event("validate", %{"filter_by" => form}, socket) do
-    {:noreply, assign(socket, form: to_form(form))}
+  def handle_event("filter", params, socket) do
+    search = Map.get(params, "search", "")
+    format = Map.get(params, "format", "")
+    status = Map.get(params, "status", "")
+
+    filters = build_filters(%{"search" => search, "format" => format, "status" => status}, 1)
+    count = Tournaments.count_tournaments_filtered(filters)
+    tournaments = Tournaments.list_tournaments_filtered(filters)
+
+    {:noreply,
+     socket
+     |> stream(:tournaments, tournaments, reset: true)
+     |> assign(
+       page: 1,
+       has_next_page?: count > @limit,
+       has_previous_page?: false,
+       search: search,
+       filter_format: format,
+       filter_status: status
+     )}
   end
 
-  @impl true
-  def handle_event(event, _, socket) do
-    case event do
-      "filter-inactive" ->
-        {:noreply,
-         stream(socket, :tournaments, Tournaments.list_tournaments("filter-inactive"),
-           reset: true
-         )}
-
-      "filter-active" ->
-        {:noreply,
-         stream(socket, :tournaments, Tournaments.list_tournaments("filter-active"), reset: true)}
-
-      "filter-none" ->
-        {:noreply, stream(socket, :tournaments, Tournaments.list_tournaments(), reset: true)}
+  defp parse_page(params) do
+    case Integer.parse(Map.get(params, "page", "1")) do
+      {page, ""} when page > 0 -> page
+      _ -> 1
     end
   end
+
+  defp build_filters(params, page) do
+    %{"limit" => @limit, "page" => page}
+    |> maybe_put("search", Map.get(params, "search", ""))
+    |> maybe_put("format", Map.get(params, "format", ""))
+    |> maybe_put("status", Map.get(params, "status", ""))
+  end
+
+  defp maybe_put(map, _key, ""), do: map
+  defp maybe_put(map, key, value), do: Map.put(map, key, value)
 end

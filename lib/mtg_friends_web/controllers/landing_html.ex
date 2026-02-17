@@ -1,144 +1,221 @@
 defmodule MtgFriendsWeb.LandingHTML do
   use MtgFriendsWeb, :html
 
+  alias MtgFriends.Tournaments
+
   def index(assigns) do
     ~H"""
-    <div class="hero h-[50vh]">
-      <div class="hero-content text-center">
-        <div class="max-w-md">
-          <h1 class="!m-0 md:!text-5xl !text-accent">
-            TCG tournaments made easy
-          </h1>
-          <p class="md:text-lg py-6 text-base-content/80">
-            Tie Breaker lets tournament organizers host their events, including Magic: The Gathering Commander nights.
-          </p>
-          <.button variant="primary" href={~p"/tournaments/new"}>Host a tournament</.button>
-          <.button href="#about">Learn more</.button>
+    <div class="min-h-screen tb-page-bg">
+      <nav class="sticky top-0 z-50 w-full border-b border-base-300 bg-base-300/80 backdrop-blur-md">
+        <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3.5">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-lg bg-primary">
+              <.icon name="hero-bolt-solid" class="size-5 text-primary-content" />
+            </div>
+            <span class="text-2xl font-bold tracking-tight text-base-content">TIE BREAKER</span>
+          </div>
+          <.button
+            navigate={~p"/tournaments/new"}
+            class="btn-sm rounded-xl px-7 py-2.5 text-sm font-bold uppercase"
+          >
+            START YOUR FIRST EVENT
+          </.button>
         </div>
-      </div>
-    </div>
-    <section id="tournaments" class="prose">
-      <h2>🦀 Latest tournaments</h2>
-      <div class="divider"></div>
-      <.item_grid
-        id="tournaments"
-        items={@latest_tournaments}
-        item_click={fn tournament -> JS.navigate(~p"/tournaments/#{tournament}") end}
-        class="!mt-0"
-      >
-        <:item :let={t} class="flex flex-col justify-between gap-2">
-          <h3 class="truncate font-semibold !m-0">{t.name}</h3>
-          <p class="game-name">{t.game.name}</p>
-          <.date dt={t.date} />
-          <h4 :if={t.location} class="icon-text">
-            <.icon name="hero-map-pin-solid" /> {t.location}
-          </h4>
-          <.tournament_status value={t.status} />
-        </:item>
-      </.item_grid>
+      </nav>
 
-      <div class="inline-block">
-        <.button href={~p"/tournaments"} variant="accent-soft">
-          <.icon name="hero-chevron-right" /> See all tournaments
-        </.button>
-      </div>
-    </section>
-    <section id="features" class="prose">
-      <h2>🌱 Features</h2>
-      <div class="divider"></div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <%= for f <- @features do %>
-          <div class="card card-border bg-base-100 border-base-300">
-            <div class="card-body">
-              <h3 class="font-bold !text-lg !m-0">
-                <.icon name={f.icon} class="size-5 mr-1" />
-                {f.title}
-              </h3>
-              <p class="text-md">{raw(f.description)}</p>
+      <main class="tb-page-bg relative overflow-hidden pb-28 pt-20">
+        <div class="absolute left-1/2 top-0 -z-10 h-[600px] w-[1000px] -translate-x-1/2 rounded-2xl bg-primary/10 blur-[120px]">
+        </div>
+
+        <section class="mx-auto max-w-7xl px-6">
+          <div class="max-w-4xl space-y-8">
+            <h1 class="font-bold leading-[1.03] tracking-tight text-base-content text-6xl">
+              PRO-LEVEL <br /> TOURNAMENT <br /> MANAGEMENT, <br />
+              <span class="text-primary">COMPLETELY FREE</span>
+            </h1>
+
+            <p class="max-w-[46rem] text-2xl leading-relaxed text-base-content/70">
+              The most powerful pairing engine for Magic: The Gathering. Built specifically for complex 3-4 player pod logic, live standings, and seamless round management.
+            </p>
+
+            <div class="flex flex-col items-center gap-4 pt-2 sm:flex-row">
+              <.button
+                navigate={~p"/tournaments/new"}
+                variant="primary"
+                class="text-xl font-bold uppercase tracking-wide"
+              >
+                Start Your First Event <.icon name="hero-arrow-right-solid" class="size-6" />
+              </.button>
+              <.button
+                href="#main-features"
+                variant="neutral"
+                class="font-semibold text-xl capitalize"
+              >
+                Explore Features
+              </.button>
             </div>
           </div>
-        <% end %>
-      </div>
-    </section>
-    <section id="about" class="prose">
-      <h2>✨ What is Tie Breaker?</h2>
-      <div class="divider"></div>
-      <div class="space-y-3">
-        <p>
-          This project was born out of love for competitive EDH, a multiplayer format for Magic: The Gathering (MTG). It all started when my friends introduced me to MTG, and I got instantly hooked with the game. We would often organize events and tournaments, but I noticed we had difficulty when hosting tournaments:
-          <i>from pairings to score-keeping, I knew what to do.</i>
-        </p>
-        <p>
-          Since this is a side project, I'm always open to new ideas, no matter how wonky they might seem. Contact me via
-          <.link href="mailto:juan@timrodz.dev" class="link">juan@timrodz.dev</.link>
-          and we'll cook up something together.
-        </p>
-      </div>
-    </section>
-    <section id="supporters" class="prose">
-      <h2>🎉 Our supporters</h2>
-      <div class="divider"></div>
-      <p class="text-lg">Trusted by WPN stores & streamers alike—Tie Breaker meets your needs.</p>
-      <div class="mt-6 mb-8 supporter-carousel grid grid-cols-2 md:grid-cols-3 gap-10 justify-items-center">
-        <%= for s <- @supporters do %>
-          <div class="tooltip tooltip-bottom flex items-center justify-center" data-tip={s.name}>
+        </section>
+
+        <section class="mx-auto mt-24 max-w-7xl px-6">
+          <div class="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <h2 class="text-5xl font-bold text-base-content">Latest tournaments</h2>
+              <p class="mt-2 text-2xl text-base-content/70">
+                Watch the top tournaments unfold in real-time.
+              </p>
+            </div>
             <.link
-              href={s.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              alt={s.name}
+              navigate={~p"/tournaments"}
+              class="hidden items-center gap-1 text-sm font-bold uppercase tracking-wider text-primary hover:text-primary md:flex"
             >
-              <img
-                src={"/images/#{s.image}"}
-                alt={"#{s.name} Image"}
-                class="object-contain rounded"
-              />
+              View All Tournaments
+              <.icon name="hero-arrow-top-right-on-square-solid" class="size-4" />
             </.link>
           </div>
-        <% end %>
-      </div>
-      <div>
-        <blockquote class="px-4 py-2 my-4 border-l-4 border-accent">
-          I've been testing different methods of pairing for a long time, and this app is exactly what I've been looking for. It offers an intuitive and streamlined process for organizing matches and tournaments, with an easy and user-friendly interface. Also, it's updated regularly with bug fixes and improvements. Recommended!
-        </blockquote>
-        <p>Jorge Ortíz — Data Engineer & MTG Streamer (DankConfidants)</p>
-      </div>
-    </section>
-    <section id="faq" class="prose">
-      <h2>🌊 Frequently Asked Questions</h2>
-      <div class="divider"></div>
+          <.live_tournaments />
+        </section>
 
-      <div id="faq-contents" class="mt-3 flex flex-col gap-3">
-        <h3>
-          What type of events can I run? (Games supported)
-        </h3>
-        <p>Magic: The Gathering</p>
-        <ul class="prose">
-          <li>Multiplayer / EDH</li>
-          <li>1v1 / Standard</li>
-        </ul>
-        <p>Pokémon</p>
-        <ul class="prose">
-          <li>Standard</li>
-        </ul>
-        <p>Yu-Gi-Oh!</p>
-        <ul class="prose">
-          <li>Standard</li>
-        </ul>
-        <h3>
-          How do players register for a tournament?
-        </h3>
-        <p>
-          Currently this can only be done by a tournament's host. When creating a tournament, you'll have to say how many participants your tournament allows. However, you can change this number at any time before your tournament begins.
-        </p>
-        <h3>
-          How much does it cost?
-        </h3>
-        <p>
-          TieBreaker is free of use. It was a passion project I started working on, and I don't plan to monetize it at the moment. You're more than welcome to provide feedback and share this app with others!
-        </p>
-      </div>
-    </section>
+        <section id="main-features" class="mx-auto mt-28 max-w-7xl px-6">
+          <div class="mb-16">
+            <h2 class="mb-4 text-6xl font-bold text-base-content">Optimized for Competitive Play</h2>
+            <p class="max-w-4xl text-2xl text-base-content/70">
+              Professional tools that scale from casual Friday nights to massive regional qualifiers, without the enterprise price tag.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <article class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50">
+              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
+                <.icon name="hero-users-solid" class="size-7 text-primary" />
+              </div>
+              <h3 class="mb-3 text-4xl font-bold text-base-content">Multi-Player Pods</h3>
+              <p class="text-xl leading-relaxed text-base-content/70">
+                Advanced support for 3 and 4-player pods. Automatically handles odd player counts and ensures diverse matchups every round.
+              </p>
+              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
+                <.icon name="hero-adjustments-horizontal-solid" class="size-4" /> Custom Pairing Logic
+              </div>
+            </article>
+
+            <article class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50">
+              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
+                <.icon name="hero-bolt-solid" class="size-7 text-primary" />
+              </div>
+              <h3 class="mb-3 text-4xl font-bold text-base-content">Instant Standings</h3>
+              <p class="text-xl leading-relaxed text-base-content/70">
+                Lightning-fast results calculation. Players can check their rank and upcoming table assignments via a simple, static URL.
+              </p>
+              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
+                <.icon name="hero-qr-code-solid" class="size-4" /> QR Ready Layouts
+              </div>
+            </article>
+
+            <article
+              id="documentation"
+              class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50"
+            >
+              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
+                <.icon name="hero-command-line-solid" class="size-7 text-primary" />
+              </div>
+              <h3 class="mb-3 text-4xl font-bold text-base-content">Robust & Reliable</h3>
+              <p class="text-xl leading-relaxed text-base-content/70">
+                Built for reliability. No heavy scripts or 3D assets to crash on mobile. Just clean, server-rendered tournament management.
+              </p>
+              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
+                <.icon name="hero-cloud-solid" class="size-4" /> 99.9% Uptime SLA
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="border-t border-base-300 bg-base-300 py-12">
+        <div class="mx-auto max-w-7xl px-6">
+          <div class="flex flex-col items-center justify-between gap-8 md:flex-row">
+            <div class="flex items-center gap-3">
+              <div class="flex size-8 items-center justify-center rounded">
+                <.icon name="hero-bolt-solid" class="size-4 text-primary" />
+              </div>
+              <span class="font-bold tracking-tighter text-base-content/80">TIE BREAKER</span>
+            </div>
+            <div class="flex gap-8 text-sm font-bold uppercase tracking-widest text-base-content/60">
+              <.link
+                href="https://github.com/timrodz/mtg-friends"
+                target="_blank"
+                class="hover:text-base-content"
+              >
+                Open Source
+              </.link>
+              <%!-- <.link href="#" class="hover:text-base-content">Privacy</.link> --%>
+
+              <%!-- <.link href="#" class="hover:text-base-content">Terms</.link> --%>
+              <.link href="mailto:juan@timrodz.dev" class="hover:text-base-content">Contact</.link>
+            </div>
+            <div class="flex items-center gap-4">
+              <.link
+                href="mailto:juan@timrodz.dev"
+                class="flex size-10 items-center justify-center rounded-2xl border border-base-300 text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content"
+              >
+                <.icon name="hero-at-symbol-solid" class="size-5" />
+              </.link>
+              <.link
+                href="https://github.com/timrodz/mtg-friends"
+                target="_blank"
+                class="flex size-10 items-center justify-center rounded-2xl border border-base-300 text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content"
+              >
+                <.icon name="hero-code-bracket-solid" class="size-5" />
+              </.link>
+            </div>
+          </div>
+          <div class="mt-8 text-center text-xs font-medium text-base-content/50 md:text-left">
+            &copy; {DateTime.utc_now().year} Tie Breaker Tournament Systems. Pro-level tools, free forever. Not affiliated with any specific TCG brand.
+          </div>
+        </div>
+      </footer>
+    </div>
     """
+  end
+
+  attr :tournaments, :list, default: nil
+
+  defp live_tournaments(assigns) do
+    tournaments = assigns.tournaments || Tournaments.list_live_tournaments(4)
+    assigns = assign(assigns, :tournaments, tournaments)
+
+    ~H"""
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <.tournament_card
+        :for={tournament <- @tournaments}
+        class="bg-base-200/90"
+        tournament={tournament}
+        navigate_to={~p"/tournaments/#{tournament}"}
+        cta_label="See more"
+        progress_text={round_progress_text(tournament)}
+        player_count={participant_count(tournament)}
+      />
+    </div>
+    """
+  end
+
+  defp participant_count(%{participants: participants}) when is_list(participants),
+    do: length(participants)
+
+  defp round_progress_text(%{round_count: round_count, rounds: rounds}) when is_list(rounds) do
+    total_rounds = max(round_count || 1, 1)
+
+    current_round =
+      case Enum.find(rounds, fn round -> round.status == :active end) do
+        nil ->
+          rounds
+          |> Enum.count(fn round -> round.status == :finished end)
+          |> Kernel.+(1)
+          |> min(total_rounds)
+
+        active_round ->
+          min(active_round.number + 1, total_rounds)
+      end
+
+    "Round #{current_round} of #{total_rounds}"
   end
 end
