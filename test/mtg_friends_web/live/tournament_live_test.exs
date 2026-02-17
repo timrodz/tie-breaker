@@ -35,7 +35,7 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
     test "lists all tournaments", %{conn: conn, tournament: tournament} do
       {:ok, _index_live, html} = live(conn, ~p"/tournaments")
 
-      assert html =~ "Discover Your Next"
+      assert html =~ "Discover your new battleground"
       assert html =~ tournament.location
     end
 
@@ -126,7 +126,6 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
       tournament = Tournaments.get_tournament!(tournament.id)
       {:ok, first_round} = Rounds.start_round(tournament)
       {:ok, _} = Rounds.update_round(first_round, %{status: :finished})
-
       conn = log_in_user(build_conn(), user)
       {:ok, view, _html} = live(conn, ~p"/tournaments/#{tournament.id}/rounds/1")
 

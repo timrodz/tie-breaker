@@ -10,7 +10,7 @@ defmodule MtgFriendsWeb.LandingHTML do
         <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3.5">
           <div class="flex items-center gap-3">
             <div class="flex size-10 items-center justify-center rounded-lg bg-primary">
-              <.icon name="hero-bolt-solid" class="size-5 text-base-content" />
+              <.icon name="hero-bolt-solid" class="size-5 text-primary-content" />
             </div>
             <span class="text-2xl font-bold tracking-tight text-base-content">TIE BREAKER</span>
           </div>
@@ -132,7 +132,7 @@ defmodule MtgFriendsWeb.LandingHTML do
         <div class="mx-auto max-w-7xl px-6">
           <div class="flex flex-col items-center justify-between gap-8 md:flex-row">
             <div class="flex items-center gap-3">
-              <div class="flex size-8 items-center justify-center rounded bg-base-200">
+              <div class="flex size-8 items-center justify-center rounded">
                 <.icon name="hero-bolt-solid" class="size-4 text-primary" />
               </div>
               <span class="font-bold tracking-tighter text-base-content/80">TIE BREAKER</span>
@@ -183,29 +183,15 @@ defmodule MtgFriendsWeb.LandingHTML do
 
     ~H"""
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <article
+      <.tournament_card
         :for={tournament <- @tournaments}
-        class="rounded-xl border border-base-300 bg-base-200/90 p-4 space-y-2"
-      >
-        <div class="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-base-content/60">
-          <span>{round_progress_text(tournament)}</span>
-        </div>
-        <h3 class="line-clamp-2 text-2xl font-bold text-base-content capitalize">
-          {tournament.name}
-        </h3>
-        <div class="flex items-center justify-between border-t border-base-300 pt-3 text-sm text-base-content/70">
-          <span class="inline-flex items-center gap-1">
-            <.icon name="hero-users-solid" class="size-4" />
-            {participant_count(tournament)} Players
-          </span>
-          <.link
-            navigate={~p"/tournaments/#{tournament}"}
-            class="text-xs font-bold uppercase tracking-wider text-base-content hover:text-primary"
-          >
-            See more
-          </.link>
-        </div>
-      </article>
+        class="bg-base-200/90"
+        tournament={tournament}
+        navigate_to={~p"/tournaments/#{tournament}"}
+        cta_label="See more"
+        progress_text={round_progress_text(tournament)}
+        player_count={participant_count(tournament)}
+      />
     </div>
     """
   end

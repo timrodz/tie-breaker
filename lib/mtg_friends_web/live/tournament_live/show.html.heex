@@ -1,7 +1,7 @@
 <div class="min-h-screen tb-page-bg text-base-content">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
-      <div class="inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
+      <div class="tb-panel-strong inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
         <.link
           navigate={~p"/tournaments/#{@tournament.id}"}
           class="rounded-xl border border-primary/80 bg-primary/15 px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-primary"
@@ -34,9 +34,7 @@
             <div class="space-y-4">
               <div class="flex items-center justify-between">
                 <span class="text-sm text-base-content/70">Tournament Status</span>
-                <span class="text-lg font-bold text-primary">
-                  {String.upcase(to_string(@tournament.status))}
-                </span>
+                <.tournament_status_badge status={@tournament.status} />
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-base-content/70">Attendance</span>
@@ -58,18 +56,17 @@
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-base-content/70">Format</span>
-                <span class="text-lg font-bold text-base-content">
-                  {to_string(@tournament.format) |> String.upcase()}
-                </span>
+                <.tournament_format
+                  format={@tournament.format}
+                  class="text-lg font-bold text-base-content"
+                />
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-base-content/70">Subformat</span>
-                <span class="text-lg font-bold text-base-content">
-                  {@tournament.subformat
-                  |> to_string()
-                  |> String.replace("_", " ")
-                  |> String.upcase()}
-                </span>
+                <.tournament_subformat
+                  subformat={@tournament.subformat}
+                  class="text-lg font-bold text-base-content"
+                />
               </div>
             </div>
           </div>
@@ -96,7 +93,7 @@
                 :if={@current_user_owner or @current_user_admin}
                 patch={~p"/tournaments/#{@tournament}/show/edit"}
                 phx-click={JS.push_focus()}
-                class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/60 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-base-content/85 transition-colors hover:border-primary/50"
+                class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/60 px-5 py-3 text-sm font-bold uppercase tracking-wide text-base-content/85 transition-colors hover:border-primary/50"
               >
                 <.icon name="hero-adjustments-horizontal-solid" class="size-4" /> Edit
               </.link>
@@ -108,7 +105,7 @@
                   not @all_participants_have_names? or @is_current_round_active? or
                     not @has_enough_participants?
                 }
-                class="inline-flex items-center gap-2 rounded-xl border border-primary bg-primary/20 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-primary-content transition-colors hover:bg-primary/30 disabled:cursor-not-allowed disabled:opacity-40"
+                class="inline-flex items-center gap-2 rounded-xl border border-primary bg-primary/20 px-5 py-3 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:bg-primary/30 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <.icon name="hero-plus-solid" class="size-4" />
                 {if length(@rounds) == 0, do: "Start Tournament", else: "Begin New Round"}
@@ -116,7 +113,7 @@
               <.link
                 :if={@latest_round}
                 navigate={~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}"}
-                class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-primary-content transition-colors hover:bg-primary/20"
+                class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-5 py-3 text-sm font-bold uppercase tracking-wide text-primary transition-colors hover:bg-primary/20"
               >
                 <.icon name="hero-arrow-right-solid" class="size-4" /> Go To Round Information
               </.link>
@@ -129,8 +126,7 @@
             {raw(@tournament.description_html)}
           </div>
         </div>
-        <div class="grid grid-cols-1 gap-6">
-          <div class="rounded-2xl border border-base-300/70 bg-base-200/70 p-6">
+          <div class="tb-panel-strong rounded-2xl border bg-base-200/70 p-6">
             <h3 class="mb-5 text-2xl font-black tracking-tight text-base-content">
               Participants & Standings
             </h3>
@@ -143,7 +139,7 @@
                 :for={{p, index} <- Enum.with_index(@participant_forms.params["participants"])}
                 id={"form-participant-#{p["id"]}"}
                 class={[
-                  "rounded-2xl border p-4",
+                  "tb-panel-strong rounded-2xl border p-4",
                   p["is_dropped"] && "border-error/30 bg-error/10",
                   not p["is_dropped"] && "border-base-300/60 bg-base-300/60"
                 ]}
@@ -168,8 +164,8 @@
                   :if={@current_user_owner or @current_user_admin}
                   class="grid grid-cols-1 gap-3 md:grid-cols-2"
                 >
-                  <label class="space-y-1">
-                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
+                  <label class="space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
                       Name
                     </span>
                     <input
@@ -182,7 +178,7 @@
                   </label>
 
                   <label class="space-y-1">
-                    <span class="text-xs font-bold uppercase tracking-[0.16em] text-base-content/60">
+                    <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
                       Decklist
                     </span>
                     <input
@@ -205,7 +201,7 @@
                       |> hide("##{p["id"]}")
                     }
                     data-confirm={"Are you sure? You're about to remove #{p["name"]} from the tournament."}
-                    class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.12em] text-error hover:text-error-content"
+                    class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-error"
                   >
                     <.icon name="hero-trash-solid" class="size-4" /> Remove
                   </.link>
@@ -216,7 +212,7 @@
                 <button
                   type="submit"
                   phx-disable-with="Saving..."
-                  class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-success-content"
+                  class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-success"
                 >
                   <.icon name="hero-check-solid" class="size-4" /> Save Changes
                 </button>
@@ -227,14 +223,13 @@
                   type="button"
                   phx-click="create-participant"
                   phx-disable-with="Creating..."
-                  class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-primary-content"
+                  class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-primary"
                 >
                   <.icon name="hero-user-plus-solid" class="size-4" /> Add Participant
                 </button>
               </:actions>
             </.simple_form>
           </div>
-        </div>
       </section>
     </main>
   </div>

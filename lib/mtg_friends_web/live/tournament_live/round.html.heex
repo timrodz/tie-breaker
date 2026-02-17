@@ -1,7 +1,7 @@
 <div class="min-h-screen tb-page-bg text-base-content">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
-      <div class="inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
+      <div class="tb-panel-strong inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
         <.link
           navigate={~p"/tournaments/#{@tournament_id}"}
           class="rounded-lg border border-transparent px-8 py-3 text-sm font-bold uppercase tracking-[0.13em] text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content/85"
@@ -24,7 +24,7 @@
             phx-click="create-round"
             disabled={!@can_start_new_round?}
             phx-disable-with="Starting..."
-            class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-primary-content disabled:cursor-not-allowed disabled:opacity-40"
+            class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-primary disabled:cursor-not-allowed disabled:opacity-40"
           >
             <.icon name="hero-plus-solid" class="size-4" /> Start New Round
           </button>
@@ -70,7 +70,7 @@
                   {case @round_status do
                     :active -> "Active"
                     :finished -> "Finished"
-                    _ -> "asd"
+                    status -> status
                   end}
                 </span>
                 <span class="h-1 w-1 rounded-2xl bg-base-content/40"></span>
@@ -106,7 +106,7 @@
               type="button"
               phx-click="start-round"
               phx-disable-with="Starting..."
-              class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] text-success-content"
+              class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-success-content"
             >
               <.icon name="hero-rocket-launch-solid" class="size-4" /> Start Round
             </button>
@@ -116,7 +116,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
           <article
             :for={{pairing, pairing_index} <- @pairings |> Enum.with_index()}
-            class="rounded-xl border border-base-300/70 bg-base-200/45 p-6 transition-colors"
+            class="tb-panel-strong rounded-xl border border-base-300/70 bg-base-200/45 p-6 transition-colors"
           >
             <div class="mb-5 border-b border-base-300/60 pb-4">
               <div class="flex items-start justify-between">
@@ -124,7 +124,7 @@
                   <p class="text-5xl font-black tracking-tight text-primary/90">
                     {(pairing_index + 1) |> Integer.to_string() |> String.pad_leading(2, "0")}
                   </p>
-                  <p class="text-xs font-bold uppercase tracking-[0.2em] text-base-content/60">
+                  <p class="text-xs font-bold uppercase tracking-widest text-base-content/60">
                     Pod
                   </p>
                 </div>
@@ -184,7 +184,7 @@
                 ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
               }
               phx-click={JS.push_focus()}
-              class="mt-4 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-primary-content"
+              class="mt-4 inline-flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/25 px-4 py-2 text-xs font-bold uppercase tracking-wide"
             >
               <.icon name="hero-pencil-square-solid" class="size-4" />
               {if pairing.active, do: "Assign Pod Results", else: "Update Pod Results"}
@@ -195,7 +195,7 @@
         <div class="py-12 text-center">
           <div class="mx-auto mb-4 h-px w-24 bg-base-content/30"></div>
           <p class="text-xs font-bold uppercase tracking-[0.3em] text-base-content/60">
-            End of round {@round_number + 1} list
+            End of round {@round_number + 1} pod list
           </p>
         </div>
       </section>

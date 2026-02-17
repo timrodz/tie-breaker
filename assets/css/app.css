@@ -137,14 +137,22 @@
         transparent
     );
     --tb-grid-dot: color-mix(in oklch, var(--color-primary) 30%, transparent);
-    --tb-glow-primary: color-mix(in oklch, var(--color-primary) 18%, transparent);
+    --tb-glow-primary: color-mix(
+        in oklch,
+        var(--color-primary) 18%,
+        transparent
+    );
     --tb-state-live: color-mix(in oklch, var(--color-success) 18%, transparent);
 }
 
 .tb-page-bg {
     background-color: var(--color-base-300);
     color: var(--color-base-content);
-    background-image: radial-gradient(circle at 2px 2px, var(--tb-grid-dot) 1px, transparent 0);
+    background-image: radial-gradient(
+        circle at 2px 2px,
+        var(--tb-grid-dot) 1px,
+        transparent 0
+    );
     background-size: 24px 24px;
 }
 
@@ -184,3 +192,7 @@
 @custom-variant phx-click-loading ([".phx-click-loading&", ".phx-click-loading &"]);
 @custom-variant phx-submit-loading ([".phx-submit-loading&", ".phx-submit-loading &"]);
 @custom-variant phx-change-loading ([".phx-change-loading&", ".phx-change-loading &"]);
+
+button {
+    @apply hover:cursor-pointer;
+}

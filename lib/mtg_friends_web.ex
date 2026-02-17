@@ -86,6 +86,7 @@ defmodule MtgFriendsWeb do
       # Core UI components and translation
       import MtgFriendsWeb.CoreComponents
       import MtgFriendsWeb.ExtendedCoreComponents
+      import MtgFriendsWeb.TournamentComponents
       import MtgFriendsWeb.Gettext
 
       # Shortcut for generating JS commands
