@@ -195,22 +195,22 @@ defmodule MtgFriendsWeb.LandingHTML do
         description:
           "Advanced support for 3 and 4-player pods. Automatically handles odd player counts and ensures diverse matchups every round.",
         icon: "hero-squares-2x2-solid",
-        footer_text: "EDH 8 player tournaments welcome",
+        footer_text: "EDH 8 player tournaments welcome"
       },
       %{
         title: "Instant Standings",
         description:
           "Lightning-fast results calculation. Players can check their rank and upcoming table assignments via QR code.",
         icon: "hero-qr-code-solid",
-        footer_text: "QR Ready Layouts",
+        footer_text: "QR Ready Layouts"
       },
       %{
         title: "Diverse Algorithms",
         description:
           "Choose from Round Robin, Bubble Rounds, or Swiss for your pod match-ups. Change any-time even if your tournament is live.",
         icon: "hero-users-solid",
-        footer_text: "Custom Pairing Logic",
-      },
+        footer_text: "Custom Pairing Logic"
+      }
       # %{
       #   title: "Open Source",
       #   description: "Built for reliability. Open sourced, Tie Breaker gives to the community a product they can fully own, completely free.",
