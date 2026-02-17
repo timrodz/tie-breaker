@@ -126,110 +126,110 @@
             {raw(@tournament.description_html)}
           </div>
         </div>
-          <div class="tb-panel-strong rounded-2xl border bg-base-200/70 p-6">
-            <h3 class="mb-5 text-2xl font-black tracking-tight text-base-content">
-              Participants & Standings
-            </h3>
-            <.simple_form
-              for={@participant_forms}
-              phx-submit="update-participants"
-              class="space-y-4"
+        <div class="tb-panel-strong rounded-2xl border bg-base-200/70 p-6">
+          <h3 class="mb-5 text-2xl font-black tracking-tight text-base-content">
+            Participants & Standings
+          </h3>
+          <.simple_form
+            for={@participant_forms}
+            phx-submit="update-participants"
+            class="space-y-4"
+          >
+            <div
+              :for={{p, index} <- Enum.with_index(@participant_forms.params["participants"])}
+              id={"form-participant-#{p["id"]}"}
+              class={[
+                "tb-panel-strong rounded-2xl border p-4",
+                p["is_dropped"] && "border-error/30 bg-error/10",
+                not p["is_dropped"] && "border-base-300/60 bg-base-300/60"
+              ]}
             >
-              <div
-                :for={{p, index} <- Enum.with_index(@participant_forms.params["participants"])}
-                id={"form-participant-#{p["id"]}"}
-                class={[
-                  "tb-panel-strong rounded-2xl border p-4",
-                  p["is_dropped"] && "border-error/30 bg-error/10",
-                  not p["is_dropped"] && "border-base-300/60 bg-base-300/60"
-                ]}
-              >
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-base-200 px-2 py-1 text-xs font-bold text-base-content/80">
-                      #{index + 1}
-                    </span>
-                    <p class="text-lg font-bold text-base-content">
-                      {p["name"] || "Unnamed Participant"}
-                    </p>
-                  </div>
-                  <p class="text-right text-sm font-semibold text-primary">
-                    {(p["scores"] && Decimal.round(p["scores"].total_score, 2)) || 0} pts
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-base-200 px-2 py-1 text-xs font-bold text-base-content/80">
+                    #{index + 1}
+                  </span>
+                  <p class="text-lg font-bold text-base-content">
+                    {p["name"] || "Unnamed Participant"}
                   </p>
                 </div>
-
-                <input type="hidden" name={"participant-id-#{p["id"]}"} value={p["id"]} />
-
-                <div
-                  :if={@current_user_owner or @current_user_admin}
-                  class="grid grid-cols-1 gap-3 md:grid-cols-2"
-                >
-                  <label class="space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
-                      Name
-                    </span>
-                    <input
-                      type="text"
-                      name={"form-participant-name-#{p["id"]}"}
-                      value={p["name"]}
-                      class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
-                      placeholder="Participant name"
-                    />
-                  </label>
-
-                  <label class="space-y-1">
-                    <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
-                      Decklist
-                    </span>
-                    <input
-                      type="url"
-                      name={"form-participant-decklist-#{p["id"]}"}
-                      value={p["decklist"]}
-                      class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
-                      placeholder="Decklist URL"
-                    />
-                  </label>
-                </div>
-
-                <div
-                  :if={@current_user_owner or @current_user_admin}
-                  class="mt-3 flex items-center justify-end"
-                >
-                  <.link
-                    phx-click={
-                      JS.push("delete-participant", value: %{id: p["id"]})
-                      |> hide("##{p["id"]}")
-                    }
-                    data-confirm={"Are you sure? You're about to remove #{p["name"]} from the tournament."}
-                    class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-error"
-                  >
-                    <.icon name="hero-trash-solid" class="size-4" /> Remove
-                  </.link>
-                </div>
+                <p class="text-right text-sm font-semibold text-primary">
+                  {(p["scores"] && Decimal.round(p["scores"].total_score, 2)) || 0} pts
+                </p>
               </div>
 
-              <:actions :if={@current_user_owner && length(@tournament.participants) > 0}>
-                <button
-                  type="submit"
-                  phx-disable-with="Saving..."
-                  class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-success"
-                >
-                  <.icon name="hero-check-solid" class="size-4" /> Save Changes
-                </button>
-              </:actions>
+              <input type="hidden" name={"participant-id-#{p["id"]}"} value={p["id"]} />
 
-              <:actions :if={@current_user_owner && length(@rounds) == 0}>
-                <button
-                  type="button"
-                  phx-click="create-participant"
-                  phx-disable-with="Creating..."
-                  class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-primary"
+              <div
+                :if={@current_user_owner or @current_user_admin}
+                class="grid grid-cols-1 gap-3 md:grid-cols-2"
+              >
+                <label class="space-y-2">
+                  <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+                    Name
+                  </span>
+                  <input
+                    type="text"
+                    name={"form-participant-name-#{p["id"]}"}
+                    value={p["name"]}
+                    class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
+                    placeholder="Participant name"
+                  />
+                </label>
+
+                <label class="space-y-1">
+                  <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+                    Decklist
+                  </span>
+                  <input
+                    type="url"
+                    name={"form-participant-decklist-#{p["id"]}"}
+                    value={p["decklist"]}
+                    class="w-full rounded-xl border border-base-300 bg-base-200 px-3 py-2 text-sm text-base-content outline-none ring-0 transition-colors focus:border-primary"
+                    placeholder="Decklist URL"
+                  />
+                </label>
+              </div>
+
+              <div
+                :if={@current_user_owner or @current_user_admin}
+                class="mt-3 flex items-center justify-end"
+              >
+                <.link
+                  phx-click={
+                    JS.push("delete-participant", value: %{id: p["id"]})
+                    |> hide("##{p["id"]}")
+                  }
+                  data-confirm={"Are you sure? You're about to remove #{p["name"]} from the tournament."}
+                  class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-error"
                 >
-                  <.icon name="hero-user-plus-solid" class="size-4" /> Add Participant
-                </button>
-              </:actions>
-            </.simple_form>
-          </div>
+                  <.icon name="hero-trash-solid" class="size-4" /> Remove
+                </.link>
+              </div>
+            </div>
+
+            <:actions :if={@current_user_owner && length(@tournament.participants) > 0}>
+              <button
+                type="submit"
+                phx-disable-with="Saving..."
+                class="inline-flex items-center gap-2 rounded-xl border border-success/50 bg-success/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-success"
+              >
+                <.icon name="hero-check-solid" class="size-4" /> Save Changes
+              </button>
+            </:actions>
+
+            <:actions :if={@current_user_owner && length(@rounds) == 0}>
+              <button
+                type="button"
+                phx-click="create-participant"
+                phx-disable-with="Creating..."
+                class="inline-flex items-center gap-2 rounded-xl border border-primary/50 bg-primary/20 px-4 py-2 text-sm font-bold uppercase tracking-wide text-primary"
+              >
+                <.icon name="hero-user-plus-solid" class="size-4" /> Add Participant
+              </button>
+            </:actions>
+          </.simple_form>
+        </div>
       </section>
     </main>
   </div>
