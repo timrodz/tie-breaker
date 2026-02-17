@@ -123,7 +123,7 @@
 :root {
     --tb-surface-elevated: color-mix(
         in oklch,
-        var(--color-base-100) 75%,
+        var(--color-base-100) 100%,
         transparent
     );
     --tb-surface-muted: color-mix(

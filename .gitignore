@@ -42,7 +42,31 @@ npm-debug.log
 .elixir-tools
 
 # Ralph working files (generated during runs)
-tasks/
 prd.json
 progress.txt
 .last-branch
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+.env
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+
+# Task files
+# tasks.json
+# tasks/ 

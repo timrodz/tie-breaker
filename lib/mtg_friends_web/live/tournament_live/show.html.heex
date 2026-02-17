@@ -1,11 +1,11 @@
 <div class="min-h-screen tb-page-bg text-base-content">
   <div class="mx-auto w-full max-w-[1800px] px-4 pb-16 pt-8 lg:px-6">
     <nav class="mb-8">
-      <div class="tb-panel-strong inline-flex items-center gap-1 rounded-xl border border-base-300/80 bg-base-200/60 p-1">
+      <div class="tb-panel-strong p-1 rounded-xl inline-block">
         <.button
           navigate={~p"/tournaments/#{@tournament.id}"}
           variant="primary"
-          class="px-8 py-3 text-sm font-bold uppercase tracking-widest"
+          class="text-sm font-bold uppercase tracking-widest"
         >
           Overview
         </.button>
@@ -17,7 +17,7 @@
           }
           variant="neutral"
           disabled={is_nil(@latest_round)}
-          class="px-8 py-3 text-sm font-bold uppercase tracking-widest"
+          class="text-sm font-bold uppercase tracking-widest"
         >
           Round Information
         </.button>
@@ -138,7 +138,7 @@
               :for={{p, index} <- Enum.with_index(@participant_forms.params["participants"])}
               id={"form-participant-#{p["id"]}"}
               class={[
-                "tb-panel-strong rounded-2xl border p-4",
+                "tb-panel rounded-2xl border p-4",
                 p["is_dropped"] && "border-error/30 bg-error/10",
                 not p["is_dropped"] && "border-base-300/60 bg-base-300/60"
               ]}
@@ -156,9 +156,8 @@
                   {(p["scores"] && Decimal.round(p["scores"].total_score, 2)) || 0} pts
                 </p>
               </div>
-
+              <%!-- Required for the form to know which participant is being updated --%>
               <input type="hidden" name={"participant-id-#{p["id"]}"} value={p["id"]} />
-
               <div
                 :if={@current_user_owner or @current_user_admin}
                 class="grid grid-cols-1 gap-3 md:grid-cols-2"
@@ -212,7 +211,7 @@
                 type="submit"
                 phx-disable-with="Saving..."
                 variant="success"
-                class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase tracking-wide"
+                class="uppercase"
               >
                 <.icon name="hero-check-solid" class="size-4" /> Save Changes
               </.button>

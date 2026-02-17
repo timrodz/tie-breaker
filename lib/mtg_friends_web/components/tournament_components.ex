@@ -62,7 +62,7 @@ defmodule MtgFriendsWeb.TournamentComponents do
     <article
       id={@id}
       class={[
-        "group rounded-2xl border border-base-300/70 bg-base-200/75 p-5 transition-colors hover:border-primary/50",
+        "tb-panel-strong group rounded-2xl p-5 transition-colors",
         @class
       ]}
     >
