@@ -41,7 +41,7 @@ defmodule MtgFriendsWeb.Router do
       live "/tournaments/new", TournamentLive.Index, :new
       live "/tournaments/:id/edit", TournamentLive.Index, :edit
 
-      live "/tournaments/:tournament_id/rounds/:round_number/pairing/:pairing_id/edit",
+      live "/tournaments/:tournament_id/rounds/:round_number/pairing/:pairing_number/edit",
            TournamentLive.Round,
            :edit
     end

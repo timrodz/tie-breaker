@@ -30,13 +30,21 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
   defp apply_action(socket, :edit, %{
          "tournament_id" => tournament_id,
          "round_number" => round_number,
-         "pairing_id" => pairing_id_str
+         "pairing_number" => pairing_number_str
        }) do
-    {pairing_id, ""} = Integer.parse(pairing_id_str)
-
-    socket
-    |> assign(:selected_pairing_id, pairing_id)
-    |> generate_socket(tournament_id, round_number, :edit)
+    with {pairing_number, ""} when pairing_number > 0 <- Integer.parse(pairing_number_str),
+         {:ok, pairing_id} <- pairing_id_from_number(tournament_id, round_number, pairing_number) do
+      socket
+      |> assign(:selected_pairing_id, pairing_id)
+      |> generate_socket(tournament_id, round_number, :edit)
+    else
+      _ ->
+        socket
+        |> put_flash(:error, "Pairing not found")
+        |> assign(:selected_pairing_id, nil)
+        |> generate_socket(tournament_id, round_number, :index)
+        |> push_patch(to: ~p"/tournaments/#{tournament_id}/rounds/#{round_number}")
+    end
   end
 
   defp generate_socket(socket, tournament_id, round_number, action) do
@@ -211,5 +219,14 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
     tournament.status != :finished and
       rounds_remaining(tournament) > 0 and
       Enum.all?(tournament.rounds, fn round -> round.status != :active end)
+  end
+
+  defp pairing_id_from_number(tournament_id, round_number, pairing_number) do
+    round = Rounds.get_round_from_round_number_str!(tournament_id, round_number)
+
+    case Enum.at(round.pairings, pairing_number - 1) do
+      nil -> :error
+      pairing -> {:ok, pairing.id}
+    end
   end
 end

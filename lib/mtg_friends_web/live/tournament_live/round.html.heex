@@ -194,7 +194,7 @@
               <.button
                 :if={@current_user_owner && @round_status != :inactive}
                 patch={
-                  ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing.id}/edit"
+                  ~p"/tournaments/#{@tournament_id}/rounds/#{@round_number + 1}/pairing/#{pairing_index + 1}/edit"
                 }
                 phx-click={JS.push_focus()}
                 variant={if pairing.active, do: "primary", else: "warning"}
