@@ -4,8 +4,6 @@ defmodule MtgFriendsWeb.AdminLive.Index do
   alias MtgFriendsWeb.UserAuth
   alias MtgFriends.Tournaments
 
-  on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok,

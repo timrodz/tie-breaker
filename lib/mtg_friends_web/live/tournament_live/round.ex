@@ -6,8 +6,6 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
   alias MtgFriends.Utils.Date
   alias MtgFriendsWeb.UserAuth
 
-  on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}

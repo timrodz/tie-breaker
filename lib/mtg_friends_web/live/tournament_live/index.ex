@@ -4,8 +4,6 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
   alias MtgFriends.Tournaments
   alias MtgFriends.Tournaments.Tournament
 
-  on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
-
   @limit 6
 
   @impl true

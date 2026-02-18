@@ -8,8 +8,6 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
   alias MtgFriends.Utils.Date
   alias MtgFriendsWeb.UserAuth
 
-  on_mount {MtgFriendsWeb.UserAuth, :mount_current_user}
-
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -107,7 +105,6 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
 
   defp page_title(:show, tournament_name), do: "#{tournament_name}"
   defp page_title(:edit, tournament_name), do: "Edit #{tournament_name}"
-  defp page_title(:end, tournament_name), do: "Finish #{tournament_name}"
 
   defp tournament_public_url(tournament_id) do
     MtgFriendsWeb.Endpoint.url() <> ~p"/tournaments/#{tournament_id}"

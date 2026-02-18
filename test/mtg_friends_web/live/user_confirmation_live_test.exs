@@ -59,16 +59,8 @@ defmodule MtgFriendsWeb.UserConfirmationLiveTest do
         build_conn()
         |> log_in_user(user)
 
-      {:ok, lv, _html} = live(conn, ~p"/users/confirm/#{token}")
-
-      result =
-        lv
-        |> form("#confirmation_form")
-        |> render_submit()
-        |> follow_redirect(conn, "/")
-
-      assert {:ok, conn} = result
-      refute Phoenix.Flash.get(conn.assigns.flash, :error)
+      assert {:error, {:redirect, %{to: "/tournaments", flash: %{}}}} =
+               live(conn, ~p"/users/confirm/#{token}")
     end
 
     test "does not confirm email with invalid token", %{conn: conn, user: user} do
