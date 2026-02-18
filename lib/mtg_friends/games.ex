@@ -38,9 +38,9 @@ defmodule MtgFriends.Games do
   """
   @spec get_game!(integer()) :: Game.t() | no_return()
   def get_game!(id), do: Repo.get!(Game, id)
-  @spec get_game_by_code!(String.t()) :: Game.t() | no_return()
+  @spec get_game_by_code!(String.t() | Game.t()) :: Game.t() | no_return()
   def get_game_by_code!(code), do: Repo.get_by!(Game, code: code)
-  @spec get_game_by_code(String.t()) :: Game.t() | nil
+  @spec get_game_by_code(String.t() | Game.t()) :: Game.t() | nil
   def get_game_by_code(code), do: Repo.get_by(Game, code: code)
 
   @doc """
