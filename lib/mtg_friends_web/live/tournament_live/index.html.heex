@@ -104,32 +104,65 @@
     </section>
 
     <div id="pagination" class="mt-10 flex justify-center">
-      <div class="inline-flex items-center gap-2 rounded-xl border border-base-300 bg-base-200/70 p-2">
-        <.button
+      <div class="inline-flex items-center gap-1 rounded-2xl border border-base-300 bg-base-200/80 px-3 py-2">
+        <.link
           :if={@has_previous_page?}
           navigate={
             ~p"/tournaments?page=#{@page - 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
           }
-          variant="neutral"
-          class="btn-square btn-sm"
+          class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-base-content transition hover:bg-base-100/70"
         >
           <.icon name="hero-chevron-left" class="size-4" />
-        </.button>
+          <span>Previous</span>
+        </.link>
 
-        <span class="inline-flex size-9 items-center justify-center rounded-lg bg-primary/20 text-sm font-bold text-primary">
-          {@page}
+        <span
+          :if={!@has_previous_page?}
+          class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-base-content/40"
+        >
+          <.icon name="hero-chevron-left" class="size-4" />
+          <span>Previous</span>
         </span>
 
-        <.button
+        <%= for item <- @pagination_items do %>
+          <%= if item.type == :ellipsis do %>
+            <span class="px-3 text-base font-semibold text-base-content/60">...</span>
+          <% else %>
+            <.link
+              navigate={
+                ~p"/tournaments?page=#{item.page}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
+              }
+              class={[
+                "inline-flex min-w-10 items-center justify-center rounded-xl px-3 py-2 text-base font-semibold transition",
+                if(item.page == @page,
+                  do: "border border-base-300 bg-base-100 text-base-content",
+                  else: "text-base-content hover:bg-base-100/70"
+                )
+              ]}
+            >
+              {item.page}
+            </.link>
+          <% end %>
+        <% end %>
+
+        <.link
           :if={@has_next_page?}
           navigate={
             ~p"/tournaments?page=#{@page + 1}&search=#{@search}&format=#{@filter_format}&status=#{@filter_status}"
           }
-          variant="neutral"
-          class="btn-square btn-sm"
+          class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-base-content transition hover:bg-base-100/70"
         >
+          <span>Next</span>
           <.icon name="hero-chevron-right" class="size-4" />
-        </.button>
+        </.link>
+
+        <span
+          :if={!@has_next_page?}
+          class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-base-content/40"
+        >
+          <span>Next</span>
+          <.icon name="hero-chevron-right" class="size-4" />
+        </span>
       </div>
     </div>
   </div>
