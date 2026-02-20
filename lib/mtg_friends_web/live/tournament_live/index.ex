@@ -3,6 +3,7 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
 
   alias MtgFriends.Tournaments
   alias MtgFriends.Tournaments.Tournament
+  alias MtgFriendsWeb.UserAuth
 
   @limit 6
 
@@ -35,9 +36,19 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit")
-    |> assign(:tournament, Tournaments.get_tournament!(id))
+    tournament = Tournaments.get_tournament!(id)
+
+    case UserAuth.ensure_can_manage_tournament(socket, tournament, ~p"/tournaments") do
+      {:ok, socket} ->
+        socket
+        |> assign(:page_title, "Edit")
+        |> assign(:tournament, tournament)
+
+      {:error, socket} ->
+        socket
+        |> assign(:page_title, "All Tournaments")
+        |> assign(:tournament, nil)
+    end
   end
 
   defp apply_action(socket, :new, _params) do
@@ -65,9 +76,15 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     tournament = Tournaments.get_tournament!(id)
-    {:ok, _} = Tournaments.delete_tournament(tournament)
 
-    {:noreply, stream_delete(socket, :tournaments, tournament)}
+    case UserAuth.ensure_can_manage_tournament(socket, tournament, ~p"/tournaments") do
+      {:ok, socket} ->
+        {:ok, _} = Tournaments.delete_tournament(tournament)
+        {:noreply, stream_delete(socket, :tournaments, tournament)}
+
+      {:error, socket} ->
+        {:noreply, socket}
+    end
   end
 
   def handle_event("filter", params, socket) do

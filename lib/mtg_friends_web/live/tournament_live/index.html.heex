@@ -97,7 +97,7 @@
           navigate_to={~p"/tournaments/#{t.id}"}
           cta_label="View tournament"
           show_format={true}
-          show_edit={@current_user && @current_user.id == t.user_id}
+          show_edit={@current_user && (@current_user.id == t.user_id || @current_user.admin)}
           edit_patch={~p"/tournaments/#{t.id}/edit"}
         />
       </div>

@@ -30,18 +30,31 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
          "round_number" => round_number,
          "pairing_number" => pairing_number_str
        }) do
-    with {pairing_number, ""} when pairing_number > 0 <- Integer.parse(pairing_number_str),
-         {:ok, pairing_id} <- pairing_id_from_number(tournament_id, round_number, pairing_number) do
-      socket
-      |> assign(:selected_pairing_id, pairing_id)
-      |> generate_socket(tournament_id, round_number, :edit)
-    else
-      _ ->
+    case UserAuth.ensure_can_manage_tournament_id(
+           socket,
+           tournament_id,
+           ~p"/tournaments/#{tournament_id}/rounds/#{round_number}"
+         ) do
+      {:ok, socket} ->
+        with {pairing_number, ""} when pairing_number > 0 <- Integer.parse(pairing_number_str),
+             {:ok, pairing_id} <-
+               pairing_id_from_number(tournament_id, round_number, pairing_number) do
+          socket
+          |> assign(:selected_pairing_id, pairing_id)
+          |> generate_socket(tournament_id, round_number, :edit)
+        else
+          _ ->
+            socket
+            |> put_flash(:error, "Pairing not found")
+            |> assign(:selected_pairing_id, nil)
+            |> generate_socket(tournament_id, round_number, :index)
+            |> push_patch(to: ~p"/tournaments/#{tournament_id}/rounds/#{round_number}")
+        end
+
+      {:error, socket} ->
         socket
-        |> put_flash(:error, "Pairing not found")
         |> assign(:selected_pairing_id, nil)
         |> generate_socket(tournament_id, round_number, :index)
-        |> push_patch(to: ~p"/tournaments/#{tournament_id}/rounds/#{round_number}")
     end
   end
 
@@ -136,43 +149,76 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
 
   @impl true
   def handle_event("start-round", _, socket) do
-    %{round_id: round_id} = socket.assigns
-    round = Rounds.get_round!(round_id)
-    Rounds.update_round(round, %{status: :active, started_at: NaiveDateTime.utc_now()})
+    redirect_to =
+      ~p"/tournaments/#{socket.assigns.tournament_id}/rounds/#{socket.assigns.round_number + 1}"
 
-    {:noreply,
-     socket
-     |> put_flash(:info, "This round has now begun!")
-     |> reload_page}
+    case UserAuth.ensure_can_manage_tournament_id(
+           socket,
+           socket.assigns.tournament_id,
+           redirect_to
+         ) do
+      {:ok, socket} ->
+        %{round_id: round_id} = socket.assigns
+        round = Rounds.get_round!(round_id)
+        Rounds.update_round(round, %{status: :active, started_at: NaiveDateTime.utc_now()})
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "This round has now begun!")
+         |> reload_page}
+
+      {:error, socket} ->
+        {:noreply, socket}
+    end
   end
 
   @impl true
   def handle_event("finish-round", _, socket) do
-    %{round_id: round_id} = socket.assigns
-    round = Rounds.get_round!(round_id)
-    Rounds.update_round(round, %{status: :finished})
+    redirect_to =
+      ~p"/tournaments/#{socket.assigns.tournament_id}/rounds/#{socket.assigns.round_number + 1}"
 
-    {:noreply,
-     socket
-     |> put_flash(:info, "This round has now begun!")
-     |> reload_page}
+    case UserAuth.ensure_can_manage_tournament_id(
+           socket,
+           socket.assigns.tournament_id,
+           redirect_to
+         ) do
+      {:ok, socket} ->
+        %{round_id: round_id} = socket.assigns
+        round = Rounds.get_round!(round_id)
+        Rounds.update_round(round, %{status: :finished})
+
+        {:noreply,
+         socket
+         |> put_flash(:info, "This round has now begun!")
+         |> reload_page}
+
+      {:error, socket} ->
+        {:noreply, socket}
+    end
   end
 
   @impl true
   def handle_event("create-round", _, socket) do
-    tournament = Tournaments.get_tournament!(socket.assigns.tournament_id)
+    redirect_to =
+      ~p"/tournaments/#{socket.assigns.tournament_id}/rounds/#{socket.assigns.round_number + 1}"
 
+    case UserAuth.ensure_can_manage_tournament_id(
+           socket,
+           socket.assigns.tournament_id,
+           redirect_to
+         ) do
+      {:ok, socket} ->
+        tournament = Tournaments.get_tournament!(socket.assigns.tournament_id)
+        handle_create_round(socket, tournament)
+
+      {:error, socket} ->
+        {:noreply, socket}
+    end
+  end
+
+  defp handle_create_round(socket, tournament) do
     if can_start_new_round?(tournament) do
-      case Rounds.start_round(tournament) do
-        {:ok, round} ->
-          {:noreply,
-           socket
-           |> put_flash(:success, "Round #{round.number + 1} created successfully")
-           |> push_navigate(to: ~p"/tournaments/#{tournament.id}/rounds/#{round.number + 1}")}
-
-        {:error, reason} ->
-          {:noreply, put_flash(socket, :error, reason)}
-      end
+      start_round_and_navigate(socket, tournament)
     else
       {:noreply,
        put_flash(
@@ -180,6 +226,19 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
          :error,
          "Cannot start a new round yet. Finish all existing rounds first."
        )}
+    end
+  end
+
+  defp start_round_and_navigate(socket, tournament) do
+    case Rounds.start_round(tournament) do
+      {:ok, round} ->
+        {:noreply,
+         socket
+         |> put_flash(:success, "Round #{round.number + 1} created successfully")
+         |> push_navigate(to: ~p"/tournaments/#{tournament.id}/rounds/#{round.number + 1}")}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, reason)}
     end
   end
 

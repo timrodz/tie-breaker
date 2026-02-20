@@ -1,6 +1,7 @@
 defmodule MtgFriendsWeb.TournamentLive.TournamentEndFormComponent do
   alias MtgFriends.Participants
   alias MtgFriends.Tournaments
+  alias MtgFriendsWeb.UserAuth
   use MtgFriendsWeb, :live_component
 
   @impl true
@@ -56,19 +57,29 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEndFormComponent do
     {participant_id, ""} = Integer.parse(participant_id_str)
     tournament = socket.assigns.tournament
 
-    participant =
-      tournament.participants
-      |> Enum.find(fn p -> p.id == participant_id end)
+    case UserAuth.ensure_can_manage_tournament(
+           socket,
+           tournament,
+           ~p"/tournaments/#{tournament.id}"
+         ) do
+      {:ok, socket} ->
+        participant =
+          tournament.participants
+          |> Enum.find(fn p -> p.id == participant_id end)
 
-    with {:ok, _} <-
-           Participants.update_participant(participant, %{"is_tournament_winner" => true}),
-         {:ok, _} <- Tournaments.update_tournament(tournament, %{"status" => :finished}) do
-      {:noreply,
-       socket |> put_flash(:success, "This tournament is now finished!") |> reload_page()}
-    else
-      _ ->
-        nil
-        {:noreply, socket |> put_flash(:error, "Error updating pairing")}
+        with {:ok, _} <-
+               Participants.update_participant(participant, %{"is_tournament_winner" => true}),
+             {:ok, _} <- Tournaments.update_tournament(tournament, %{"status" => :finished}) do
+          {:noreply,
+           socket |> put_flash(:success, "This tournament is now finished!") |> reload_page()}
+        else
+          _ ->
+            nil
+            {:noreply, socket |> put_flash(:error, "Error updating pairing")}
+        end
+
+      {:error, socket} ->
+        {:noreply, socket}
     end
   end
 

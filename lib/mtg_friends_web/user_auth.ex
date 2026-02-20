@@ -5,6 +5,7 @@ defmodule MtgFriendsWeb.UserAuth do
   import Phoenix.Controller
 
   alias MtgFriends.Accounts
+  alias MtgFriends.Tournaments
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -251,7 +252,38 @@ defmodule MtgFriendsWeb.UserAuth do
     Phoenix.Component.assign(
       socket,
       :current_user_owner,
-      not is_nil(current_user) && current_user.id == tournament.user_id
+      can_manage_tournament?(current_user, tournament)
     )
+  end
+
+  def can_manage_tournament?(nil, _tournament), do: false
+  def can_manage_tournament?(%{admin: true}, _tournament), do: true
+
+  def can_manage_tournament?(current_user, tournament) do
+    current_user.id == tournament.user_id
+  end
+
+  def ensure_can_manage_tournament(socket, tournament, redirect_to) do
+    if can_manage_tournament?(socket.assigns.current_user, tournament) do
+      {:ok, socket}
+    else
+      {:error,
+       socket
+       |> Phoenix.LiveView.put_flash(:error, "You are not authorized to edit this tournament.")
+       |> Phoenix.LiveView.push_navigate(to: redirect_to)}
+    end
+  end
+
+  def ensure_can_manage_tournament_id(socket, tournament_id, redirect_to) do
+    case Tournaments.get_tournament_simple(tournament_id) do
+      nil ->
+        {:error,
+         socket
+         |> Phoenix.LiveView.put_flash(:error, "Tournament not found.")
+         |> Phoenix.LiveView.push_navigate(to: redirect_to)}
+
+      tournament ->
+        ensure_can_manage_tournament(socket, tournament, redirect_to)
+    end
   end
 end
