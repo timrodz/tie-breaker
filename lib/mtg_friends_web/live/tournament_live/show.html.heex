@@ -162,7 +162,7 @@
             >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                  <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-base-200 px-2 py-1 text-xs font-bold text-base-content/80">
+                  <span class="inline-flex min-w-8 items-center justify-center rounded-lg bg-base-300 px-2 py-1 text-xs font-bold text-base-content/80">
                     #{index + 1}
                   </span>
                   <p class="text-lg font-bold text-base-content inline-flex items-center gap-1">
@@ -184,10 +184,12 @@
                 :if={@current_user_owner or @current_user_admin}
                 class="grid grid-cols-1 gap-3 md:grid-cols-2"
               >
-                <label class="space-y-2">
-                  <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
-                    Name
-                  </span>
+                <div>
+                  <label class="space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+                      Name
+                    </span>
+                  </label>
                   <input
                     type="text"
                     name={"form-participant-name-#{p["id"]}"}
@@ -195,12 +197,13 @@
                     class="participant-form-input"
                     placeholder="Richard Garfield..."
                   />
-                </label>
-
-                <label class="space-y-1">
-                  <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
-                    Decklist
-                  </span>
+                </div>
+                <div>
+                  <label class="space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
+                      Decklist
+                    </span>
+                  </label>
                   <input
                     type="url"
                     name={"form-participant-decklist-#{p["id"]}"}
@@ -208,9 +211,8 @@
                     class="participant-form-input"
                     placeholder="https://moxfield.com/..."
                   />
-                </label>
+                </div>
               </div>
-
               <div
                 :if={@current_user_owner or @current_user_admin}
                 class="mt-3 flex items-center justify-end"
