@@ -263,6 +263,14 @@ defmodule MtgFriendsWeb.UserAuth do
     current_user.id == tournament.user_id
   end
 
+  def ensure_authenticated(socket) do
+    socket.assigns.current_user do
+      {:ok, socket}
+    else
+      {:error, socket}
+    end
+  end
+
   def ensure_can_manage_tournament(socket, tournament, redirect_to) do
     if can_manage_tournament?(socket.assigns.current_user, tournament) do
       {:ok, socket}

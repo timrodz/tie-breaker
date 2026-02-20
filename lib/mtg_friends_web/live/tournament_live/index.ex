@@ -52,9 +52,15 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
   end
 
   defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New Tournament")
-    |> assign(:tournament, %Tournament{})
+    if socket.assigns.current_user do
+      socket
+      |> assign(:page_title, "New Tournament")
+      |> assign(:tournament, %Tournament{})
+    else
+      socket
+      |> put_flash(:error, "You must log in to create a tournament.")
+      |> redirect(to: ~p"/users/log_in")
+    end
   end
 
   defp apply_action(socket, :index, _params) do
@@ -77,12 +83,12 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
   def handle_event("delete", %{"id" => id}, socket) do
     tournament = Tournaments.get_tournament!(id)
 
-    case UserAuth.ensure_can_manage_tournament(socket, tournament, ~p"/tournaments") do
-      {:ok, socket} ->
-        {:ok, _} = Tournaments.delete_tournament(tournament)
-        {:noreply, stream_delete(socket, :tournaments, tournament)}
-
-      {:error, socket} ->
+    with {:ok, socket} <-
+           UserAuth.ensure_can_manage_tournament(socket, tournament, ~p"/tournaments"),
+         {:ok, _} <- Tournaments.delete_tournament(tournament) do
+      {:noreply, stream_delete(socket, :tournaments, tournament)}
+    else
+      _ ->
         {:noreply, socket}
     end
   end

@@ -73,7 +73,7 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
       |> UserAuth.assign_current_user_owner(current_user, tournament)
       |> UserAuth.assign_current_user_admin(socket.assigns.current_user)
       |> assign(:has_winner?, not is_nil(winner))
-      |> assign(:page_title, page_title(live_action, tournament.name |> String.capitalize()))
+      |> assign(:page_title, page_title(live_action, tournament.name))
       |> assign(:tournament, tournament)
       |> assign(:tournament_public_url, tournament_public_url)
       |> assign(:tournament_qr_svg, QR.svg(tournament_public_url))
@@ -224,16 +224,16 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
        |> put_flash(:error, "Participant does not belong to this tournament.")
        |> reload_page()}
     else
-      case UserAuth.ensure_can_manage_tournament(
-             socket,
-             tournament,
-             ~p"/tournaments/#{tournament.id}"
-           ) do
-        {:ok, socket} ->
-          {:ok, _} = Participants.delete_participant(participant)
-          {:noreply, reload_page(socket)}
-
-        {:error, socket} ->
+      with {:ok, socket} <-
+             UserAuth.ensure_can_manage_tournament(
+               socket,
+               tournament,
+               ~p"/tournaments/#{tournament.id}"
+             ),
+           {:ok, _} <- Participants.delete_participant(participant) do
+        {:noreply, reload_page(socket)}
+      else
+        _ ->
           {:noreply, socket}
       end
     end

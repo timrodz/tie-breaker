@@ -99,7 +99,7 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       :timer.cancel(ref)
     end
 
-    tournament_name = round.tournament.name |> String.capitalize()
+    tournament_name = round.tournament.name
 
     socket
     |> assign(

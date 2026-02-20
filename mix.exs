@@ -13,7 +13,7 @@ defmodule MtgFriends.MixProject do
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
       dialyzer: [plt_add_apps: [:mix]],
       test_coverage: [
-        summary: [threshold: 73.00],
+        summary: [threshold: 74.42],
         ignore_modules: [
           MtgFriendsWeb.LandingHTML,
           MtgFriendsWeb.ErrorHTML,
@@ -79,7 +79,6 @@ defmodule MtgFriends.MixProject do
       {:calendar, "~> 1.0.0"},
       {:gen_smtp, "~> 1.1"},
       {:hammer, "~> 7.0"},
-      {:open_api_spex, "~> 3.18"},
       {:expletive, "~> 0.1.0"},
       {:qr_code, "~> 3.2"},
       {:remote_ip, "~> 1.1"},
