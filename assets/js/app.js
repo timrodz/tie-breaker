@@ -31,15 +31,10 @@ let liveSocket = new LiveSocket("/live", Socket, {
 
 const initPosthog = () => {
   const apiKey = document
-    .querySelector("meta[name='posthog-api-key']")
+    .querySelector("meta[name='posthog-project-api-key']")
     ?.getAttribute("content");
 
   if (!apiKey || apiKey.trim() === "") return;
-
-  const apiHost =
-    document
-      .querySelector("meta[name='posthog-api-host']")
-      ?.getAttribute("content") || "https://us.i.posthog.com";
 
   if (window.posthog?.__SV) {
     return;
@@ -64,7 +59,9 @@ const initPosthog = () => {
         p = t.createElement("script");
         p.type = "text/javascript";
         p.async = true;
-        p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js";
+        p.src =
+          s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+          "/static/array.js";
         r = t.getElementsByTagName("script")[0];
         r.parentNode.insertBefore(p, r);
         let u = e;
@@ -83,9 +80,10 @@ const initPosthog = () => {
         u.people.toString = function () {
           return u.toString(1) + ".people (stub)";
         };
-        o = "init capture register register_once register_for_session unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group identify setPersonProperties setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups onFeatureFlags addFeatureFlagsHandler onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(
-          " "
-        );
+        o =
+          "init capture register register_once register_for_session unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group identify setPersonProperties setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups onFeatureFlags addFeatureFlagsHandler onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(
+            " ",
+          );
         for (n = 0; n < o.length; n++) g(u, o[n]);
         e._i.push([i, s, a]);
       };
@@ -94,7 +92,7 @@ const initPosthog = () => {
   })(document, window.posthog || []);
 
   window.posthog.init(apiKey, {
-    api_host: apiHost,
+    api_host: "https://us.i.posthog.com",
     defaults: "2026-01-30",
   });
 };
@@ -113,9 +111,12 @@ const initTheme = () => {
   setTheme(localStorage.getItem("phx:theme") || "system");
   window.addEventListener(
     "storage",
-    (event) => event.key === "phx:theme" && setTheme(event.newValue || "system")
+    (event) =>
+      event.key === "phx:theme" && setTheme(event.newValue || "system"),
   );
-  window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
+  window.addEventListener("phx:set-theme", ({ detail: { theme } }) =>
+    setTheme(theme),
+  );
 };
 
 const cssVar = (name) =>
@@ -128,7 +129,8 @@ const syncTopbarTheme = () => {
   topbar.config({
     barColors: { 0: primary || "oklch(51% 0.262 276.966)" },
     shadowColor:
-      baseContent || "color-mix(in oklch, var(--color-base-content) 30%, transparent)",
+      baseContent ||
+      "color-mix(in oklch, var(--color-base-content) 30%, transparent)",
   });
 };
 
@@ -183,10 +185,10 @@ if (process.env.NODE_ENV === "development") {
             reloader.openEditorAtDef(e.target);
           }
         },
-        true
+        true,
       );
 
       window.liveReloader = reloader;
-    }
+    },
   );
 }

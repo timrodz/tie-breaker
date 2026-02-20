@@ -33,13 +33,9 @@
 
     <%!-- Analytics configuration consumed by assets/js/app.js --%>
     <meta
-      :if={not is_nil(System.get_env("POSTHOG_API_KEY"))}
-      name="posthog-api-key"
-      content={System.get_env("POSTHOG_API_KEY")}
-    />
-    <meta
-      name="posthog-api-host"
-      content={System.get_env("POSTHOG_API_HOST") || "https://us.i.posthog.com"}
+      :if={not is_nil(System.get_env("POSTHOG_PROJECT_API_KEY"))}
+      name="posthog-project-api-key"
+      content={System.get_env("POSTHOG_PROJECT_API_KEY")}
     />
 
     <.live_title suffix=" - Tie breaker">

@@ -121,11 +121,6 @@
 }
 
 :root {
-    --tb-surface-elevated: color-mix(
-        in oklch,
-        var(--color-base-100) 100%,
-        transparent
-    );
     --tb-surface-muted: color-mix(
         in oklch,
         var(--color-base-200) 82%,
@@ -164,7 +159,7 @@
 
 .tb-panel-strong {
     border: 1px solid var(--tb-border-soft);
-    background: var(--tb-surface-elevated);
+    background: var(--color-base-100);
     color: var(--color-base-content);
 }
 
