@@ -23,7 +23,6 @@ defmodule MtgFriends.Games.Game do
   def changeset(game, attrs) do
     game
     |> cast(attrs, [:name, :code, :url])
-    |> ValidationHelper.allow_empty_strings()
     |> validate_required([:name, :code])
   end
 end

@@ -1,6 +1,5 @@
 defmodule MtgFriendsWeb.Router do
   use MtgFriendsWeb, :router
-  alias OpenApiSpex
 
   import MtgFriendsWeb.UserAuth
 
@@ -12,20 +11,6 @@ defmodule MtgFriendsWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
-  end
-
-  pipeline :api do
-    plug :accepts, ["json"]
-    plug OpenApiSpex.Plug.PutApiSpec, module: MtgFriendsWeb.ApiSpec
-    plug :rate_limit
-  end
-
-  pipeline :api_authenticated do
-    plug MtgFriendsWeb.APIAuthPlug
-  end
-
-  pipeline :authorize_tournament_owner do
-    plug MtgFriendsWeb.Plugs.AuthorizeTournamentOwner
   end
 
   scope "/", MtgFriendsWeb do
@@ -124,26 +109,6 @@ defmodule MtgFriendsWeb.Router do
 
       live "/games/:id", GameLive.Show, :show
       live "/games/:id/show/edit", GameLive.Show, :edit
-    end
-  end
-
-  defp rate_limit(conn, _opts) do
-    if Application.get_env(:mtg_friends, :disable_rate_limit) do
-      conn
-    else
-      ip_string = conn.remote_ip |> :inet.ntoa() |> to_string()
-
-      case MtgFriendsWeb.RateLimit.hit("api:#{ip_string}", 60_000, 60) do
-        {:allow, _count} ->
-          conn
-
-        {:deny, _limit} ->
-          conn
-          |> put_status(:too_many_requests)
-          |> put_resp_content_type("application/json")
-          |> send_resp(429, Jason.encode!(%{error: "Rate limit exceeded"}))
-          |> halt()
-      end
     end
   end
 end
