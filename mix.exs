@@ -11,6 +11,7 @@ defmodule MtgFriends.MixProject do
       aliases: aliases(),
       deps: deps(),
       compilers: [:phoenix_live_view] ++ Mix.compilers(),
+      dialyzer: [plt_add_apps: [:mix]],
       test_coverage: [
         summary: [threshold: 73.00],
         ignore_modules: [

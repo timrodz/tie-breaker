@@ -29,6 +29,95 @@ let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
 });
 
+const initPosthog = () => {
+  const apiKey = document
+    .querySelector("meta[name='posthog-api-key']")
+    ?.getAttribute("content");
+
+  if (!apiKey || apiKey.trim() === "") return;
+
+  const apiHost =
+    document
+      .querySelector("meta[name='posthog-api-host']")
+      ?.getAttribute("content") || "https://us.i.posthog.com";
+
+  if (window.posthog?.__SV) {
+    return;
+  }
+
+  !(function (t, e) {
+    let o, n, p, r;
+    if (!e.__SV) {
+      window.posthog = e;
+      e._i = [];
+      e.init = function (i, s, a) {
+        function g(t, e) {
+          const o = e.split(".");
+          if (o.length === 2) {
+            t = t[o[0]];
+            e = o[1];
+          }
+          t[e] = function () {
+            t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+          };
+        }
+        p = t.createElement("script");
+        p.type = "text/javascript";
+        p.async = true;
+        p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js";
+        r = t.getElementsByTagName("script")[0];
+        r.parentNode.insertBefore(p, r);
+        let u = e;
+        if (a !== undefined) {
+          u = e[a] = [];
+        } else {
+          a = "posthog";
+        }
+        u.people = u.people || [];
+        u.toString = function (t) {
+          let e = "posthog";
+          if (a !== "posthog") e += "." + a;
+          if (!t) e += " (stub)";
+          return e;
+        };
+        u.people.toString = function () {
+          return u.toString(1) + ".people (stub)";
+        };
+        o = "init capture register register_once register_for_session unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group identify setPersonProperties setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags resetGroups onFeatureFlags addFeatureFlagsHandler onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep".split(
+          " "
+        );
+        for (n = 0; n < o.length; n++) g(u, o[n]);
+        e._i.push([i, s, a]);
+      };
+      e.__SV = 1;
+    }
+  })(document, window.posthog || []);
+
+  window.posthog.init(apiKey, {
+    api_host: apiHost,
+    defaults: "2026-01-30",
+  });
+};
+
+const initTheme = () => {
+  const setTheme = (theme) => {
+    if (theme === "system") {
+      localStorage.removeItem("phx:theme");
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      localStorage.setItem("phx:theme", theme);
+      document.documentElement.setAttribute("data-theme", theme);
+    }
+  };
+
+  setTheme(localStorage.getItem("phx:theme") || "system");
+  window.addEventListener(
+    "storage",
+    (event) => event.key === "phx:theme" && setTheme(event.newValue || "system")
+  );
+  window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
+};
+
 const cssVar = (name) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
@@ -44,6 +133,8 @@ const syncTopbarTheme = () => {
 };
 
 // Show progress bar on live navigation and form submits
+initPosthog();
+initTheme();
 syncTopbarTheme();
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(300));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());

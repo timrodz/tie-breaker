@@ -76,4 +76,4 @@ jobs:
         run: mix test --cover
 
       - name: Run dialyzer
-        run: mix dialyzer --format short
+        run: mix dialyzer --quiet-with-result --format short

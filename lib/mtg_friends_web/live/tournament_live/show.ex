@@ -104,14 +104,14 @@ defmodule MtgFriendsWeb.TournamentLive.Show do
 
     socket =
       if live_action == :edit do
-        case UserAuth.ensure_can_manage_tournament(
-               socket,
-               tournament,
-               ~p"/tournaments/#{tournament.id}"
-             ) do
-          {:ok, socket} -> socket
-          {:error, socket} -> socket
-        end
+        {_, socket} =
+          UserAuth.ensure_can_manage_tournament(
+            socket,
+            tournament,
+            ~p"/tournaments/#{tournament.id}"
+          )
+
+        socket
       else
         socket
       end

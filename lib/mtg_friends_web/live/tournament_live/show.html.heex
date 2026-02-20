@@ -185,12 +185,13 @@
                 class="grid grid-cols-1 gap-3 md:grid-cols-2"
               >
                 <div>
-                  <label class="space-y-2">
+                  <label for={"participant-name-#{p["id"]}"} class="space-y-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
                       Name
                     </span>
                   </label>
                   <input
+                    id={"participant-name-#{p["id"]}"}
                     type="text"
                     name={"form-participant-name-#{p["id"]}"}
                     value={p["name"]}
@@ -199,12 +200,13 @@
                   />
                 </div>
                 <div>
-                  <label class="space-y-2">
+                  <label for={"participant-decklist#{p["id"]}"} class="space-y-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-base-content/60">
                       Decklist
                     </span>
                   </label>
                   <input
+                    id={"participant-decklist-#{p["id"]}"}
                     type="url"
                     name={"form-participant-decklist-#{p["id"]}"}
                     value={p["decklist"]}

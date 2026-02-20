@@ -149,7 +149,7 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
           items
         end
 
-      {items ++ [%{type: :page, page: current_page}], current_page}
+      {[%{type: :page, page: current_page} | items], current_page}
     end)
     |> elem(0)
   end
