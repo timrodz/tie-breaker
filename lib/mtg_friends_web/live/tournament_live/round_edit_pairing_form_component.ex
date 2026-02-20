@@ -6,6 +6,7 @@ defmodule MtgFriendsWeb.TournamentLive.RoundEditPairingFormComponent do
   alias MtgFriends.Pairings
   alias MtgFriends.Tournaments
   alias MtgFriends.Rounds
+  alias MtgFriendsWeb.UserAuth
 
   @impl true
   def render(assigns) do
@@ -69,30 +70,39 @@ defmodule MtgFriendsWeb.TournamentLive.RoundEditPairingFormComponent do
     %{tournament_id: tournament_id, round_id: round_id} =
       socket.assigns
 
-    {:ok, _} = Pairings.update_pairings(tournament_id, round_id, params)
+    case UserAuth.ensure_can_manage_tournament_id(socket, tournament_id, socket.assigns.navigate) do
+      {:ok, socket} ->
+        {:ok, _} = Pairings.update_pairings(tournament_id, round_id, params)
 
-    tournament = Tournaments.get_tournament_simple!(tournament_id)
-    round = Rounds.get_round!(round_id)
+        tournament = Tournaments.get_tournament_simple!(tournament_id)
+        round = Rounds.get_round!(round_id)
 
-    # Check logic via Rounds context
-    case Rounds.check_and_finalize(round, tournament) do
-      {:ok, _round, :tournament_finished} ->
-        {:noreply,
-         socket
-         |> put_flash(:success, "Last pod updated successfully - Tournament has finished!")
-         |> push_navigate(to: ~p"/tournaments/#{tournament.id}")}
+        # Check logic via Rounds context
+        case Rounds.check_and_finalize(round, tournament) do
+          {:ok, _round, :tournament_finished} ->
+            {:noreply,
+             socket
+             |> put_flash(:success, "Last pod updated successfully - Tournament has finished!")
+             |> push_navigate(to: ~p"/tournaments/#{tournament.id}")}
 
-      {:ok, _round, _status} ->
-        {:noreply,
-         socket
-         |> put_flash(:success, "Pod updated successfully")
-         |> push_navigate(to: socket.assigns.navigate)}
+          {:ok, _round, _status} ->
+            {:noreply,
+             socket
+             |> put_flash(:success, "Pod updated successfully")
+             |> push_navigate(to: socket.assigns.navigate)}
 
-      {:error, _changeset} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Failed to finalize round. Please check your inputs and try again.")
-         |> push_navigate(to: socket.assigns.navigate)}
+          {:error, _changeset} ->
+            {:noreply,
+             socket
+             |> put_flash(
+               :error,
+               "Failed to finalize round. Please check your inputs and try again."
+             )
+             |> push_navigate(to: socket.assigns.navigate)}
+        end
+
+      {:error, socket} ->
+        {:noreply, socket}
     end
   end
 end

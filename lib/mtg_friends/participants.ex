@@ -114,7 +114,7 @@ defmodule MtgFriends.Participants do
           |> Participant.changeset(%{
             inserted_at: now,
             updated_at: now,
-            name: participant |> String.trim() |> String.capitalize(),
+            name: participant |> String.trim(),
             points: 0,
             decklist: "",
             tournament_id: tournament_id
@@ -155,10 +155,10 @@ defmodule MtgFriends.Participants do
     decklist_valid = not is_nil(decklist) and name != ""
 
     if name_valid and decklist_valid do
-      %{"name" => name |> String.capitalize(), "decklist" => decklist}
+      %{"name" => name, "decklist" => decklist}
     else
       if name_valid do
-        %{"name" => name |> String.capitalize(), "decklist" => decklist}
+        %{"name" => name, "decklist" => decklist}
       else
         %{"decklist" => decklist}
       end

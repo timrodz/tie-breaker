@@ -4,6 +4,7 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
   use MtgFriendsWeb, :live_component
 
   alias MtgFriends.Tournaments
+  alias MtgFriendsWeb.UserAuth
 
   @impl true
   def render(assigns) do
@@ -168,32 +169,34 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
   defp save_tournament(socket, :edit, tournament_params) do
     tournament = socket.assigns.tournament
 
-    # This could be optimized but we're chilling for now
-    game = Games.get_game_by_code!(socket.assigns.selected_game_code)
+    case UserAuth.ensure_can_manage_tournament(
+           socket,
+           tournament,
+           ~p"/tournaments/#{tournament.id}"
+         ) do
+      {:ok, socket} ->
+        # This could be optimized but we're chilling for now
+        game = Games.get_game_by_code!(socket.assigns.selected_game_code)
 
-    tournament_params =
-      tournament_params
-      |> Map.put("game_id", game.id)
+        tournament_params = Map.put(tournament_params, "game_id", game.id)
+        navigate_to = Map.get(socket.assigns, :navigate)
 
-    case Tournaments.update_tournament(tournament, tournament_params) do
-      {:ok, updated_tournament} ->
-        notify_parent({:saved, updated_tournament})
+        case Tournaments.update_tournament(tournament, tournament_params) do
+          {:ok, updated_tournament} ->
+            notify_parent({:saved, updated_tournament})
+            dest = navigate_to || ~p"/tournaments/#{updated_tournament}"
 
-        {:noreply,
-         case Map.get(socket.assigns, :navigate) do
-           nil ->
+            {:noreply,
              socket
              |> put_flash(:success, "Tournament updated successfully")
-             |> push_navigate(to: ~p"/tournaments/#{updated_tournament}")
+             |> push_navigate(to: dest)}
 
-           path ->
-             socket
-             |> put_flash(:success, "Tournament updated successfully")
-             |> push_navigate(to: path)
-         end}
+          {:error, %Ecto.Changeset{} = changeset} ->
+            {:noreply, assign_form(socket, changeset)}
+        end
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+      {:error, socket} ->
+        {:noreply, socket}
     end
   end
 

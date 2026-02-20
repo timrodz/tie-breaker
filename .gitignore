@@ -42,7 +42,6 @@ npm-debug.log
 .elixir-tools
 
 # Ralph working files (generated during runs)
-tasks/
 prd.json
 progress.txt
 .last-branch

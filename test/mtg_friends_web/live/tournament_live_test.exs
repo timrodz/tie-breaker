@@ -70,16 +70,40 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
 
       assert_redirect(edit_live, ~p"/tournaments/#{tournament.id}")
     end
+
+    test "non-owner cannot access edit route" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      tournament = tournament_fixture(%{user: owner})
+      conn = log_in_user(build_conn(), other_user)
+
+      assert {:error, {:live_redirect, %{to: "/tournaments"}}} =
+               live(conn, ~p"/tournaments/#{tournament}/edit")
+    end
+
+    test "admin can access edit route for any tournament and sees edit action on list" do
+      owner = user_fixture()
+      admin = user_fixture(%{admin: true})
+      tournament = tournament_fixture(%{user: owner})
+      conn = log_in_user(build_conn(), admin)
+
+      {:ok, index_live, _html} = live(conn, ~p"/tournaments")
+      assert has_element?(index_live, "a[href='/tournaments/#{tournament.id}/edit']")
+
+      {:ok, edit_live, _html} = live(conn, ~p"/tournaments/#{tournament}/edit")
+      assert has_element?(edit_live, "#tournament-form")
+    end
   end
 
   describe "Show" do
     setup [:create_tournament]
 
     test "displays tournament", %{conn: conn, tournament: tournament} do
-      {:ok, _show_live, html} = live(conn, ~p"/tournaments/#{tournament}")
+      {:ok, show_live, html} = live(conn, ~p"/tournaments/#{tournament}")
 
       assert html =~ tournament.name
       assert html =~ tournament.location
+      assert has_element?(show_live, "#tournament-qr-code svg")
     end
 
     test "updates tournament within modal" do
@@ -92,6 +116,46 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
       show_live |> element("a", "Edit") |> render_click()
 
       assert_patch(show_live, ~p"/tournaments/#{tournament}/show/edit")
+    end
+
+    test "non-owner cannot access show edit route" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      tournament = tournament_fixture(%{user: owner})
+      conn = log_in_user(build_conn(), other_user)
+
+      assert {:error, {:live_redirect, %{to: to}}} =
+               live(conn, ~p"/tournaments/#{tournament}/show/edit")
+
+      assert to == "/tournaments/#{tournament.id}"
+    end
+
+    test "non-owner cannot trigger write events from show route" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      tournament = tournament_fixture(%{user: owner})
+      conn = log_in_user(build_conn(), other_user)
+
+      {:ok, show_live, _html} = live(conn, ~p"/tournaments/#{tournament}")
+
+      participants_before =
+        tournament.id
+        |> Tournaments.get_tournament!()
+        |> Map.get(:participants)
+        |> length()
+
+      show_live
+      |> render_click("create-participant")
+
+      assert_redirect(show_live, ~p"/tournaments/#{tournament.id}")
+
+      participants_after =
+        tournament.id
+        |> Tournaments.get_tournament!()
+        |> Map.get(:participants)
+        |> length()
+
+      assert participants_before == participants_after
     end
   end
 
@@ -138,6 +202,25 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
       rounds = Rounds.list_rounds(tournament.id)
       assert length(rounds) == 2
       assert Enum.any?(rounds, fn round -> round.number == 1 and round.status == :active end)
+    end
+
+    test "non-owner cannot access round edit pairing route" do
+      owner = user_fixture()
+      other_user = user_fixture()
+      tournament = tournament_fixture(%{user: owner, round_count: 2})
+
+      for idx <- 1..4 do
+        participant_fixture(%{tournament: tournament, name: "Player #{idx}"})
+      end
+
+      tournament = Tournaments.get_tournament!(tournament.id)
+      {:ok, _round} = Rounds.start_round(tournament)
+      conn = log_in_user(build_conn(), other_user)
+
+      assert {:error, {:live_redirect, %{to: to}}} =
+               live(conn, ~p"/tournaments/#{tournament.id}/rounds/1/pairing/1/edit")
+
+      assert to == "/tournaments/#{tournament.id}/rounds/1"
     end
   end
 end

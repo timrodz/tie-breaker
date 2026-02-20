@@ -1,6 +1,5 @@
 defmodule MtgFriendsWeb.Router do
   use MtgFriendsWeb, :router
-  alias OpenApiSpex
 
   import MtgFriendsWeb.UserAuth
 
@@ -14,20 +13,6 @@ defmodule MtgFriendsWeb.Router do
     plug :fetch_current_user
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-    plug OpenApiSpex.Plug.PutApiSpec, module: MtgFriendsWeb.ApiSpec
-    plug :rate_limit
-  end
-
-  pipeline :api_authenticated do
-    plug MtgFriendsWeb.APIAuthPlug
-  end
-
-  pipeline :authorize_tournament_owner do
-    plug MtgFriendsWeb.Plugs.AuthorizeTournamentOwner
-  end
-
   scope "/", MtgFriendsWeb do
     pipe_through [:browser, :require_authenticated_user]
 
@@ -35,15 +20,6 @@ defmodule MtgFriendsWeb.Router do
       on_mount: [{MtgFriendsWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
-
-      live "/tournaments/:id/show/edit", TournamentLive.Show, :edit
-      live "/tournaments/:id/show/end", TournamentLive.Show, :end
-      live "/tournaments/new", TournamentLive.Index, :new
-      live "/tournaments/:id/edit", TournamentLive.Index, :edit
-
-      live "/tournaments/:tournament_id/rounds/:round_number/pairing/:pairing_id/edit",
-           TournamentLive.Round,
-           :edit
     end
   end
 
@@ -51,47 +27,34 @@ defmodule MtgFriendsWeb.Router do
     pipe_through :browser
 
     get "/", LandingController, :index
-    live "/tournaments", TournamentLive.Index, :index
-    live "/tournaments/:id", TournamentLive.Show, :show
-    live "/tournaments/:tournament_id/rounds/:round_number", TournamentLive.Round, :index
-  end
 
-  scope "/api", MtgFriendsWeb do
-    pipe_through :api
+    live_session :tournaments_current_user,
+      on_mount: [{MtgFriendsWeb.UserAuth, :mount_current_user}] do
+      # Piping :require_authenticated_user in individual scopes
+      # Makes the live views and components protected
 
-    post "/login", API.SessionController, :create
+      scope "/tournaments" do
+        live "/", TournamentLive.Index, :index
 
-    resources "/tournaments", API.TournamentController, only: [:index, :show] do
-      resources "/participants", API.ParticipantController, only: [:index, :show]
+        scope "/new" do
+          pipe_through :require_authenticated_user
 
-      resources "/rounds", API.RoundController, only: [:index, :show] do
-        resources "/pairings", API.PairingController, only: [:index, :show]
-      end
-    end
-  end
+          live "/", TournamentLive.Index, :new
+        end
 
-  scope "/api" do
-    pipe_through :api
-    get "/openapi", OpenApiSpex.Plug.RenderSpec, [MtgFriendsWeb.Schemas]
-    get "/swagger", OpenApiSpex.Plug.SwaggerUI, path: "api/openapi", title: "Tie Breaker API"
-  end
+        scope "/:id" do
+          live "/", TournamentLive.Show, :show
 
-  scope "/api", MtgFriendsWeb do
-    pipe_through [:api, :api_authenticated]
+          pipe_through :require_authenticated_user
+          live "/edit", TournamentLive.Index, :edit
+          live "/show/edit", TournamentLive.Show, :edit
+        end
 
-    scope "/tournaments", API do
-      post "/", TournamentController, :create
+        scope "/:tournament_id/rounds/:round_number" do
+          live "/", TournamentLive.Round, :index
 
-      scope "/:tournament_id" do
-        pipe_through :authorize_tournament_owner
-
-        put "/", TournamentController, :update
-        delete "/", TournamentController, :delete
-
-        resources "/participants", ParticipantController, only: [:create, :update, :delete]
-
-        resources "/rounds", RoundController, only: [:create, :update, :delete] do
-          resources "/pairings", PairingController, only: [:create, :update, :delete]
+          pipe_through :require_authenticated_user
+          live "/pairing/:pairing_number/edit", TournamentLive.Round, :edit
         end
       end
     end
@@ -117,7 +80,7 @@ defmodule MtgFriendsWeb.Router do
   ## Authentication routes
 
   scope "/", MtgFriendsWeb do
-    pipe_through [:browser, :redirect_if_user_is_authenticated]
+    pipe_through [:browser]
 
     live_session :redirect_if_user_is_authenticated,
       on_mount: [{MtgFriendsWeb.UserAuth, :redirect_if_user_is_authenticated}] do
@@ -125,21 +88,12 @@ defmodule MtgFriendsWeb.Router do
       live "/users/log_in", UserLoginLive, :new
       live "/users/reset_password", UserForgotPasswordLive, :new
       live "/users/reset_password/:token", UserResetPasswordLive, :edit
-    end
-
-    post "/users/log_in", UserSessionController, :create
-  end
-
-  scope "/", MtgFriendsWeb do
-    pipe_through [:browser]
-
-    delete "/users/log_out", UserSessionController, :delete
-
-    live_session :current_user,
-      on_mount: [{MtgFriendsWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
+
+    delete "/users/log_out", UserSessionController, :delete
+    post "/users/log_in", UserSessionController, :create
   end
 
   scope "/admin", MtgFriendsWeb do
@@ -155,26 +109,6 @@ defmodule MtgFriendsWeb.Router do
 
       live "/games/:id", GameLive.Show, :show
       live "/games/:id/show/edit", GameLive.Show, :edit
-    end
-  end
-
-  defp rate_limit(conn, _opts) do
-    if Application.get_env(:mtg_friends, :disable_rate_limit) do
-      conn
-    else
-      ip_string = conn.remote_ip |> :inet.ntoa() |> to_string()
-
-      case MtgFriendsWeb.RateLimit.hit("api:#{ip_string}", 60_000, 60) do
-        {:allow, _count} ->
-          conn
-
-        {:deny, _limit} ->
-          conn
-          |> put_status(:too_many_requests)
-          |> put_resp_content_type("application/json")
-          |> send_resp(429, Jason.encode!(%{error: "Rate limit exceeded"}))
-          |> halt()
-      end
     end
   end
 end

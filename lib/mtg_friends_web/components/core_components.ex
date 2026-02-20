@@ -260,20 +260,24 @@ defmodule MtgFriendsWeb.CoreComponents do
       |> assign(:variant_class, variant_classes(assigns[:variant]))
       |> assign(
         :base_class,
-        "btn border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+        "pointer-events-auto btn border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
       )
 
     if rest[:href] || rest[:navigate] || rest[:patch] do
       ~H"""
-      <.link class={[@base_class, @variant_class, @class]} {@rest}>
-        {render_slot(@inner_block)}
-      </.link>
+      <div class="bg-base-100 inline-block rounded-xl">
+        <.link class={[@base_class, @variant_class, @class]} {@rest}>
+          {render_slot(@inner_block)}
+        </.link>
+      </div>
       """
     else
       ~H"""
-      <button class={[@base_class, @variant_class, @class]} {@rest}>
-        {render_slot(@inner_block)}
-      </button>
+      <div class="bg-base-100 rounded-xl">
+        <button class={[@base_class, @variant_class, @class]} {@rest}>
+          {render_slot(@inner_block)}
+        </button>
+      </div>
       """
     end
   end
@@ -285,11 +289,11 @@ defmodule MtgFriendsWeb.CoreComponents do
       "secondary" =>
         "border-secondary/50 bg-secondary/20 text-secondary hover:border-secondary hover:bg-secondary/30",
       "neutral" =>
-        "border-neutral/50 bg-neutral/20 text-neutral hover:border-neutral hover:bg-neutral/30",
+        "border-neutral/30 bg-neutral/10 text-neutral hover:border-neutral/50 hover:bg-neutral/20",
       "success" =>
-        "border-success/50 bg-success/20 text-success hover:border-success hover:bg-success/30",
+        "border-success/50 bg-success/10 text-success hover:border-success hover:bg-success/20",
       "warning" =>
-        "border-warning/50 bg-warning/20 text-warning hover:border-warning hover:bg-warning/30",
+        "border-warning/50 bg-warning/10 text-warning hover:border-warning hover:bg-warning/20",
       "error" => "border-error/50 bg-error/20 text-error hover:border-error hover:bg-error/30",
       "info" => "border-info/50 bg-info/20 text-info hover:border-info hover:bg-info/30",
       "ghost" =>

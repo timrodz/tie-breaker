@@ -31,35 +31,18 @@
     <meta property="twitter:creator" content="@timrodz" />
     <meta property="twitter:creator:id" content="timrodz" />
 
-    <%!-- Analytics by https://beamanalytics.io --%>
-    <script
-      src="https://beamanalytics.b-cdn.net/beam.min.js"
-      data-token="308008b2-6185-4337-9bb4-6697be781e80"
-      async
-    >
-    </script>
+    <%!-- Analytics configuration consumed by assets/js/app.js --%>
+    <meta
+      :if={not is_nil(System.get_env("POSTHOG_PROJECT_API_KEY"))}
+      name="posthog-project-api-key"
+      content={System.get_env("POSTHOG_PROJECT_API_KEY")}
+    />
 
     <.live_title suffix=" - Tie breaker">
       {assigns[:page_title] || "Tie breaker"}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
-    </script>
-    <script>
-      (() => {
-        const setTheme = (theme) => {
-          if (theme === "system") {
-            localStorage.removeItem("phx:theme");
-            document.documentElement.removeAttribute("data-theme");
-          } else {
-            localStorage.setItem("phx:theme", theme);
-            document.documentElement.setAttribute("data-theme", theme);
-          }
-        };
-        setTheme(localStorage.getItem("phx:theme") || "system");
-        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
-      })();
     </script>
   </head>
   <body class="bg-base-200 antialiased">

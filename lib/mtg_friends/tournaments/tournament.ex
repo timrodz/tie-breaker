@@ -2,7 +2,6 @@ defmodule MtgFriends.Tournaments.Tournament do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias ValidationHelper
   alias MtgFriends.Utils.ProfanityFilter
 
   schema "tournaments" do

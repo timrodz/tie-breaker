@@ -4,6 +4,8 @@ defmodule MtgFriendsWeb.LandingHTML do
   alias MtgFriends.Tournaments
 
   def index(assigns) do
+    assigns = Map.put(assigns, :features, get_features())
+
     ~H"""
     <div class="min-h-screen tb-page-bg">
       <nav class="sticky top-0 z-50 w-full border-b border-base-300 bg-base-300/80 backdrop-blur-md">
@@ -16,9 +18,9 @@ defmodule MtgFriendsWeb.LandingHTML do
           </div>
           <.button
             navigate={~p"/tournaments/new"}
-            class="btn-sm rounded-xl px-7 py-2.5 text-sm font-bold uppercase"
+            class="uppercase"
           >
-            START YOUR FIRST EVENT
+            GET STARTED
           </.button>
         </div>
       </nav>
@@ -29,12 +31,11 @@ defmodule MtgFriendsWeb.LandingHTML do
 
         <section class="mx-auto max-w-7xl px-6">
           <div class="max-w-4xl space-y-8">
-            <h1 class="font-bold leading-[1.03] tracking-tight text-base-content text-6xl">
-              PRO-LEVEL <br /> TOURNAMENT <br /> MANAGEMENT, <br />
-              <span class="text-primary">COMPLETELY FREE</span>
+            <h1 class="font-black leading-xl text-base-content text-5xl md:text-6xl">
+              PRO-LEVEL <br /> TOURNAMENT <br /> MANAGEMENT
             </h1>
 
-            <p class="max-w-[46rem] text-2xl leading-relaxed text-base-content/70">
+            <p class="max-w-[46rem] text-2xl leading-8.5 text-base-content/70 bg-base-300">
               The most powerful pairing engine for Magic: The Gathering. Built specifically for complex 3-4 player pod logic, live standings, and seamless round management.
             </p>
 
@@ -44,7 +45,7 @@ defmodule MtgFriendsWeb.LandingHTML do
                 variant="primary"
                 class="text-xl font-bold uppercase tracking-wide"
               >
-                Start Your First Event <.icon name="hero-arrow-right-solid" class="size-6" />
+                START YOUR TOURNAMENT<.icon name="hero-arrow-right-solid" class="size-6" />
               </.button>
               <.button
                 href="#main-features"
@@ -61,82 +62,68 @@ defmodule MtgFriendsWeb.LandingHTML do
           <div class="mb-6 flex items-end justify-between gap-4">
             <div>
               <h2 class="text-5xl font-bold text-base-content">Latest tournaments</h2>
-              <p class="mt-2 text-2xl text-base-content/70">
+              <p class="mt-2 text-2xl text-base-content/70 bg-base-300">
                 Watch the top tournaments unfold in real-time.
               </p>
             </div>
+          </div>
+          <.live_tournaments />
+          <div class="ml-2 mt-4">
             <.link
               navigate={~p"/tournaments"}
-              class="hidden items-center gap-1 text-sm font-bold uppercase tracking-wider text-primary hover:text-primary md:flex"
+              class="inline-flex items-center gap-1 text-md bg-base-300 font-bold uppercase tracking-widest text-primary hover:text-primary"
             >
               View All Tournaments
               <.icon name="hero-arrow-top-right-on-square-solid" class="size-4" />
             </.link>
           </div>
-          <.live_tournaments />
         </section>
 
         <section id="main-features" class="mx-auto mt-28 max-w-7xl px-6">
           <div class="mb-16">
-            <h2 class="mb-4 text-6xl font-bold text-base-content">Optimized for Competitive Play</h2>
-            <p class="max-w-4xl text-2xl text-base-content/70">
+            <h2 class="mb-4 text-5xl font-bold text-base-content">Optimized for Competitive Play</h2>
+            <p class="max-w-4xl text-2xl text-base-content/70 bg-base-300">
               Professional tools that scale from casual Friday nights to massive regional qualifiers, without the enterprise price tag.
             </p>
           </div>
 
           <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <article class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50">
-              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-                <.icon name="hero-users-solid" class="size-7 text-primary" />
-              </div>
-              <h3 class="mb-3 text-4xl font-bold text-base-content">Multi-Player Pods</h3>
-              <p class="text-xl leading-relaxed text-base-content/70">
-                Advanced support for 3 and 4-player pods. Automatically handles odd player counts and ensures diverse matchups every round.
-              </p>
-              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
-                <.icon name="hero-adjustments-horizontal-solid" class="size-4" /> Custom Pairing Logic
-              </div>
-            </article>
-
-            <article class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50">
-              <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-                <.icon name="hero-bolt-solid" class="size-7 text-primary" />
-              </div>
-              <h3 class="mb-3 text-4xl font-bold text-base-content">Instant Standings</h3>
-              <p class="text-xl leading-relaxed text-base-content/70">
-                Lightning-fast results calculation. Players can check their rank and upcoming table assignments via a simple, static URL.
-              </p>
-              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
-                <.icon name="hero-qr-code-solid" class="size-4" /> QR Ready Layouts
-              </div>
-            </article>
-
             <article
-              id="documentation"
+              :for={feature <- @features}
               class="rounded-xl border border-base-300 bg-base-200 p-8 transition-colors hover:border-primary/50"
             >
               <div class="mb-6 flex size-12 items-center justify-center rounded-lg bg-primary/10">
-                <.icon name="hero-command-line-solid" class="size-7 text-primary" />
+                <.icon name={feature.icon} class="size-7 text-primary" />
               </div>
-              <h3 class="mb-3 text-4xl font-bold text-base-content">Robust & Reliable</h3>
+              <h3 class="mb-3 text-4xl font-bold text-base-content">{feature.title}</h3>
               <p class="text-xl leading-relaxed text-base-content/70">
-                Built for reliability. No heavy scripts or 3D assets to crash on mobile. Just clean, server-rendered tournament management.
+                {feature.description}
               </p>
-              <div class="mt-6 flex items-center gap-2 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
-                <.icon name="hero-cloud-solid" class="size-4" /> 99.9% Uptime SLA
+              <div class="mt-6 border-t border-base-300 pt-6 text-xs font-bold uppercase tracking-tighter text-base-content/60">
+                <p
+                  :if={Map.has_key?(feature, :footer_text)}
+                  class="flex items-center gap-2"
+                >
+                  {feature.footer_text}
+                </p>
+                <.link
+                  :if={Map.has_key?(feature, :href)}
+                  href={feature.href}
+                  class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-primary hover:text-primary/80"
+                >
+                  Learn More <.icon name="hero-arrow-up-right-solid" class="size-4" />
+                </.link>
               </div>
             </article>
           </div>
         </section>
       </main>
 
-      <footer class="border-t border-base-300 bg-base-300 py-12">
+      <footer class="border-t border-base-300 bg-base-300 pt-6 pb-8">
         <div class="mx-auto max-w-7xl px-6">
-          <div class="flex flex-col items-center justify-between gap-8 md:flex-row">
-            <div class="flex items-center gap-3">
-              <div class="flex size-8 items-center justify-center rounded">
-                <.icon name="hero-bolt-solid" class="size-4 text-primary" />
-              </div>
+          <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div class="flex justify-center items-center gap-3">
+              <.icon name="hero-bolt-solid" class="size-4 text-primary" />
               <span class="font-bold tracking-tighter text-base-content/80">TIE BREAKER</span>
             </div>
             <div class="flex gap-8 text-sm font-bold uppercase tracking-widest text-base-content/60">
@@ -147,29 +134,11 @@ defmodule MtgFriendsWeb.LandingHTML do
               >
                 Open Source
               </.link>
-              <%!-- <.link href="#" class="hover:text-base-content">Privacy</.link> --%>
-
-              <%!-- <.link href="#" class="hover:text-base-content">Terms</.link> --%>
               <.link href="mailto:juan@timrodz.dev" class="hover:text-base-content">Contact</.link>
             </div>
-            <div class="flex items-center gap-4">
-              <.link
-                href="mailto:juan@timrodz.dev"
-                class="flex size-10 items-center justify-center rounded-2xl border border-base-300 text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content"
-              >
-                <.icon name="hero-at-symbol-solid" class="size-5" />
-              </.link>
-              <.link
-                href="https://github.com/timrodz/mtg-friends"
-                target="_blank"
-                class="flex size-10 items-center justify-center rounded-2xl border border-base-300 text-base-content/70 transition-colors hover:border-base-300 hover:text-base-content"
-              >
-                <.icon name="hero-code-bracket-solid" class="size-5" />
-              </.link>
+            <div class="text-center text-xs font-medium text-base-content/50 md:text-left">
+              &copy; {DateTime.utc_now().year} Tie Breaker Tournament Systems. Pro-level tools, free forever. Not affiliated with any specific TCG brand.
             </div>
-          </div>
-          <div class="mt-8 text-center text-xs font-medium text-base-content/50 md:text-left">
-            &copy; {DateTime.utc_now().year} Tie Breaker Tournament Systems. Pro-level tools, free forever. Not affiliated with any specific TCG brand.
           </div>
         </div>
       </footer>
@@ -217,5 +186,37 @@ defmodule MtgFriendsWeb.LandingHTML do
       end
 
     "Round #{current_round} of #{total_rounds}"
+  end
+
+  defp get_features do
+    [
+      %{
+        title: "Multi-player Pods",
+        description:
+          "Advanced support for 3 and 4-player pods. Automatically handles odd player counts and ensures diverse matchups every round.",
+        icon: "hero-squares-2x2-solid",
+        footer_text: "EDH 8 player tournaments welcome"
+      },
+      %{
+        title: "Instant Standings",
+        description:
+          "Lightning-fast results calculation. Players can check their rank and upcoming table assignments via QR code.",
+        icon: "hero-qr-code-solid",
+        footer_text: "QR Ready Layouts"
+      },
+      %{
+        title: "Diverse Algorithms",
+        description:
+          "Choose from Round Robin, Bubble Rounds, or Swiss for your pod match-ups. Change any-time even if your tournament is live.",
+        icon: "hero-users-solid",
+        footer_text: "Custom Pairing Logic"
+      }
+      # %{
+      #   title: "Open Source",
+      #   description: "Built for reliability. Open sourced, Tie Breaker gives to the community a product they can fully own, completely free.",
+      #   icon: "hero-code-bracket-square-solid",
+      #   href: "https://github.com/timrodz/mtg-friends"
+      # }
+    ]
   end
 end

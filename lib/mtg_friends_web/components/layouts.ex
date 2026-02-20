@@ -86,8 +86,7 @@ defmodule MtgFriendsWeb.Layouts do
             Version: <span class="font-mono">{@app_version}</span>
           </p>
           <div class="inline-flex items-center gap-2 text-base-content/70 uppercase">
-            <.icon name="hero-bolt-solid" class="size-3.5 text-primary" />
-            Powered by the Tie Breaker Engine
+            <.icon name="hero-bolt-solid" class="size-3.5 text-primary" /> TIE BREAKER
           </div>
           <.theme_toggle />
         </div>

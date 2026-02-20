@@ -62,22 +62,24 @@ defmodule MtgFriendsWeb.TournamentComponents do
     <article
       id={@id}
       class={[
-        "group rounded-2xl border border-base-300/70 bg-base-200/75 p-5 transition-colors hover:border-primary/50",
+        "tb-panel-strong group rounded-2xl p-5 transition-colors",
         @class
       ]}
     >
-      <div class="mb-5 flex items-center justify-between border-b border-base-300/60 pb-4">
+      <div class="mb-4 border-b border-base-300/60 pb-4">
         <p class="line-clamp-1 text-xl font-bold tracking-tight text-base-content capitalize">
           {@tournament.name}
         </p>
-        <.tournament_status_badge :if={@show_status} status={@tournament.status} />
       </div>
 
-      <div
-        :if={@progress_text}
-        class="mb-2 text-xs font-bold uppercase tracking-wider text-base-content/60"
-      >
-        {@progress_text}
+      <div :if={@progress_text || @show_status} class="mb-3 flex items-center justify-between gap-3">
+        <p
+          :if={@progress_text}
+          class="text-xs font-bold uppercase tracking-wider text-base-content/60"
+        >
+          {@progress_text}
+        </p>
+        <.tournament_status_badge :if={@show_status} status={@tournament.status} />
       </div>
 
       <div class="space-y-2 text-sm text-base-content/80">
