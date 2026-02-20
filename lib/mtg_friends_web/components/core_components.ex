@@ -260,7 +260,7 @@ defmodule MtgFriendsWeb.CoreComponents do
       |> assign(:variant_class, variant_classes(assigns[:variant]))
       |> assign(
         :base_class,
-        "btn border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+        "pointer-events-auto btn border transition-colors disabled:cursor-not-allowed disabled:opacity-40"
       )
 
     if rest[:href] || rest[:navigate] || rest[:patch] do

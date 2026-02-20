@@ -10,13 +10,13 @@
           Overview
         </.button>
         <.button
+          :if={@latest_round}
           navigate={
             if @latest_round,
               do: ~p"/tournaments/#{@tournament.id}/rounds/#{@latest_round.number + 1}",
               else: ~p"/tournaments/#{@tournament.id}"
           }
           variant="neutral"
-          disabled={is_nil(@latest_round)}
           class="text-sm font-bold uppercase tracking-widest"
         >
           Round Information
