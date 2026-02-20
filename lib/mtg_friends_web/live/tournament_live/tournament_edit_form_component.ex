@@ -178,26 +178,18 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
         # This could be optimized but we're chilling for now
         game = Games.get_game_by_code!(socket.assigns.selected_game_code)
 
-        tournament_params =
-          tournament_params
-          |> Map.put("game_id", game.id)
+        tournament_params = Map.put(tournament_params, "game_id", game.id)
+        navigate_to = Map.get(socket.assigns, :navigate)
 
         case Tournaments.update_tournament(tournament, tournament_params) do
           {:ok, updated_tournament} ->
             notify_parent({:saved, updated_tournament})
+            dest = navigate_to || ~p"/tournaments/#{updated_tournament}"
 
             {:noreply,
-             case Map.get(socket.assigns, :navigate) do
-               nil ->
-                 socket
-                 |> put_flash(:success, "Tournament updated successfully")
-                 |> push_navigate(to: ~p"/tournaments/#{updated_tournament}")
-
-               path ->
-                 socket
-                 |> put_flash(:success, "Tournament updated successfully")
-                 |> push_navigate(to: path)
-             end}
+             socket
+             |> put_flash(:success, "Tournament updated successfully")
+             |> push_navigate(to: dest)}
 
           {:error, %Ecto.Changeset{} = changeset} ->
             {:noreply, assign_form(socket, changeset)}
