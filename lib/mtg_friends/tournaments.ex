@@ -420,11 +420,21 @@ defmodule MtgFriends.Tournaments do
       String.replace(description_raw, "\n", "</br>")
   end
 
-  def rounds_remaining(tournament) do
+  def rounds_remaining(%Tournament{} = tournament) do
+    tournament =
+      if Ecto.assoc_loaded?(tournament.rounds),
+        do: tournament,
+        else: Repo.preload(tournament, :rounds)
+
     max(tournament.round_count - length(tournament.rounds), 0)
   end
 
-  def can_start_new_round?(tournament) do
+  def can_start_new_round?(%Tournament{} = tournament) do
+    tournament =
+      if Ecto.assoc_loaded?(tournament.rounds),
+        do: tournament,
+        else: Repo.preload(tournament, :rounds)
+
     tournament.status != :finished and
       rounds_remaining(tournament) > 0 and
       Enum.all?(tournament.rounds, fn round -> round.status != :active end)
