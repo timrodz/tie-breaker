@@ -47,7 +47,7 @@ defmodule MtgFriends.Analytics do
   end
 
   defp posthog_ready? do
-    Application.get_env(:posthog, :enabled, false) and
+    Application.get_env(:posthog, :enable, false) and
       is_pid(Process.whereis(PostHog.Supervisor))
   end
 end
