@@ -9,10 +9,10 @@
 #   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
 #   - https://hub.docker.com/_/debian/tags?name=bookworm-20260202-slim - for the release image
 #   - https://pkgs.org/ - resource for finding needed packages
-#   - Ex: docker.io/hexpm/elixir:1.19.5-erlang-26.0.2-debian-bookworm-20260202-slim
+#   - Ex: docker.io/hexpm/elixir:1.19.5-erlang-26.2.5.17-debian-bookworm-20260202-slim
 #
 ARG ELIXIR_VERSION=1.19.5
-ARG OTP_VERSION=26.0.2
+ARG OTP_VERSION=26.2.5.17
 ARG DEBIAN_VERSION=bookworm-20260202-slim
 
 ARG BUILDER_IMAGE="docker.io/hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
