@@ -1,8 +1,9 @@
 defmodule MtgFriendsWeb.TournamentComponents do
+  @moduledoc """
+  components tailored to tournaments
+  """
   use Phoenix.Component
-  @moduledoc false
 
-  alias MtgFriends.TournamentRenderer
   import MtgFriendsWeb.CoreComponents
   import MtgFriendsWeb.ExtendedCoreComponents
 
@@ -16,7 +17,7 @@ defmodule MtgFriendsWeb.TournamentComponents do
       status_classes(@status),
       @class
     ]}>
-      {TournamentRenderer.render_status(@status)}
+      {render_status(@status)}
     </span>
     """
   end
@@ -27,7 +28,7 @@ defmodule MtgFriendsWeb.TournamentComponents do
   def tournament_format(assigns) do
     ~H"""
     <span class={@class}>
-      {TournamentRenderer.render_format(@format)}
+      {render_format(@format)}
     </span>
     """
   end
@@ -38,7 +39,7 @@ defmodule MtgFriendsWeb.TournamentComponents do
   def tournament_subformat(assigns) do
     ~H"""
     <span class={@class}>
-      {TournamentRenderer.render_subformat(@subformat)}
+      {render_subformat(@subformat)}
     </span>
     """
   end
@@ -141,4 +142,48 @@ defmodule MtgFriendsWeb.TournamentComponents do
   defp tournament_game_name(%{game: %Ecto.Association.NotLoaded{}}), do: nil
   defp tournament_game_name(%{game: %{name: name}}) when is_binary(name), do: name
   defp tournament_game_name(_), do: nil
+
+  @spec render_status(atom()) :: String.t()
+  def render_status(status) do
+    case status do
+      :inactive -> "Open"
+      :active -> "In progress"
+      :finished -> "Finished"
+    end
+  end
+
+  @spec render_round_status(atom()) :: String.t()
+  def render_round_status(status) do
+    case status do
+      :inactive -> "Pairing players"
+      :active -> "In progress"
+      :finished -> "Finished"
+      _ -> "??"
+    end
+  end
+
+  @doc """
+  Renders tournament format as display text.
+  """
+  @spec render_format(atom() | nil) :: String.t()
+  def render_format(format) do
+    case format do
+      :edh -> "Commander (EDH)"
+      :standard -> "Standard"
+      nil -> ""
+    end
+  end
+
+  @doc """
+  Renders tournament subformat as display text.
+  """
+  @spec render_subformat(atom() | nil) :: String.t()
+  def render_subformat(subformat) do
+    case subformat do
+      :bubble_rounds -> "Bubble Rounds"
+      :swiss -> "Swiss Rounds"
+      :round_robin -> "Round Robin"
+      nil -> ""
+    end
+  end
 end

@@ -78,7 +78,6 @@ defmodule MtgFriends.MixProject do
       {:tzdata, "~> 1.1.2"},
       {:calendar, "~> 1.0.0"},
       {:gen_smtp, "~> 1.1"},
-      {:hammer, "~> 7.0"},
       {:expletive, "~> 0.1.0"},
       {:qr_code, "~> 3.2"},
       {:remote_ip, "~> 1.1"},
