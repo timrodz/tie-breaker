@@ -77,10 +77,17 @@ if config_env() == :prod do
     password: System.get_env("MAILER_SMTP_PASSWORD") || "",
     port: System.get_env("MAILER_SMTP_PORT") || 1
 
+  posthog_api_key =
+    System.get_env("POSTHOG_PROJECT_API_KEY") ||
+      raise """
+      environment variable POSTHOG_PROJECT_API_KEY is missing.
+      PostHog analytics requires an API key to function.
+      """
+
   config :posthog,
     enable: true,
     test_mode: false,
-    api_key: System.get_env("POSTHOG_PROJECT_API_KEY")
+    api_key: posthog_api_key
 
   # ## SSL Support
   #
