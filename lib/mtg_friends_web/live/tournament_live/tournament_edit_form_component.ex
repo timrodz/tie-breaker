@@ -131,8 +131,7 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
 
   @impl true
   def handle_event("validate", %{"tournament" => tournament_params}, socket) do
-    selected_game_code =
-      tournament_params["game_code"] |> String.to_atom()
+    selected_game_code = tournament_params["game_code"]
 
     format_options = get_format_options(selected_game_code)
 
@@ -143,7 +142,7 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
           format_options |> Enum.at(0) |> elem(1)
 
         false ->
-          tournament_params["format"] |> String.to_atom()
+          tournament_params["format"]
       end
 
     subformat_options =
@@ -240,15 +239,8 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
     ]
   end
 
-  defp get_format_options(game_code) do
-    case game_code do
-      :mtg ->
-        [{"Commander (EDH)", :edh}]
-
-      _ ->
-        [{"Standard", :standard}]
-    end
-  end
+  defp get_format_options("mtg"), do: [{"Commander (EDH)", :edh}]
+  defp get_format_options(_), do: [{"Standard", :standard}]
 
   defp get_subformat_options(:mtg, :edh, participant_count) do
     round_robin_label =
