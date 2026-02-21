@@ -402,7 +402,16 @@ defmodule MtgFriends.Tournaments do
       fn og_name ->
         metadata = Enum.find(cards_to_search, fn card -> card.og_name == og_name end)
 
-        "<a class=\"underline\" target=\"_blank\" href=\"#{metadata.image_uri}\">#{metadata.name}</a>"
+        escaped_name =
+          metadata.name |> Phoenix.HTML.html_escape() |> Phoenix.HTML.safe_to_string()
+
+        escaped_uri =
+          metadata.image_uri
+          |> URI.encode()
+          |> Phoenix.HTML.html_escape()
+          |> Phoenix.HTML.safe_to_string()
+
+        "<a class=\"underline\" target=\"_blank\" href=\"#{escaped_uri}\">#{escaped_name}</a>"
       end
     )
   catch
