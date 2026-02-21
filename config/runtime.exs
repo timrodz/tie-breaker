@@ -77,6 +77,11 @@ if config_env() == :prod do
     password: System.get_env("MAILER_SMTP_PASSWORD") || "",
     port: System.get_env("MAILER_SMTP_PORT") || 1
 
+  config :posthog,
+    enable: true,
+    test_mode: false,
+    api_key: System.get_env("POSTHOG_PROJECT_API_KEY")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

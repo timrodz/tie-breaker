@@ -20,7 +20,3 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
-config :posthog,
-  enable: true,
-  test_mode: false,
-  api_key: System.get_env("POSTHOG_PROJECT_API_KEY")
