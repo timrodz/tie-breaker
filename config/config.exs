@@ -62,3 +62,10 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+config :posthog,
+  enable: false,
+  enable_error_tracking: true,
+  api_host: "https://us.i.posthog.com",
+  api_key: System.get_env("POSTHOG_PROJECT_API_KEY"),
+  in_app_otp_apps: [:mtg_friends]

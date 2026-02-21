@@ -38,3 +38,7 @@ config :logger, level: :warning
 config :phoenix, :plug_init_mode, :runtime
 
 config :mtg_friends, :disable_rate_limit, true
+
+config :posthog,
+  enabled: false,
+  test_mode: true
