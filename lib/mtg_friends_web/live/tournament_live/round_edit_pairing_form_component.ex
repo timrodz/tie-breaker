@@ -105,7 +105,10 @@ defmodule MtgFriendsWeb.TournamentLive.RoundEditPairingFormComponent do
       end
     else
       _ ->
-        {:noreply, socket}
+        {:noreply,
+         socket
+         |> put_flash(:error, "Failed to update pod. Please try again.")
+         |> push_navigate(to: socket.assigns.navigate)}
     end
   end
 end
