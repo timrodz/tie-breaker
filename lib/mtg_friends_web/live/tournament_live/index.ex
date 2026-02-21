@@ -150,7 +150,7 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
     |> Enum.reduce({[], nil}, fn current_page, {items, previous_page} ->
       items =
         if previous_page && current_page - previous_page > 1 do
-          items ++ [%{type: :ellipsis}]
+          [%{type: :ellipsis} | items]
         else
           items
         end
@@ -158,6 +158,7 @@ defmodule MtgFriendsWeb.TournamentLive.Index do
       {[%{type: :page, page: current_page} | items], current_page}
     end)
     |> elem(0)
+    |> Enum.reverse()
   end
 
   defp maybe_put(map, _key, ""), do: map
