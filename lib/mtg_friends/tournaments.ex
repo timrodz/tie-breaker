@@ -414,7 +414,7 @@ defmodule MtgFriends.Tournaments do
         "<a class=\"underline\" target=\"_blank\" href=\"#{escaped_uri}\">#{escaped_name}</a>"
       end
     )
-  catch
+  rescue
     e ->
       Logger.warning("Failed to validate description with card metadata: #{inspect(e)}")
       String.replace(description_raw, "\n", "</br>")
