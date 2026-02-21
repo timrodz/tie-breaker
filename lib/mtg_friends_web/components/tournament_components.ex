@@ -130,60 +130,41 @@ defmodule MtgFriendsWeb.TournamentComponents do
     """
   end
 
-  defp status_classes(status) do
-    case status do
-      :active -> "border border-success/40 bg-success/20 text-success"
-      :inactive -> "border border-primary/40 bg-primary/20 text-primary"
-      :finished -> "border border-error/40 bg-error/20 text-error"
-      _ -> "border border-base-300/40 bg-base-200/40 text-base-content"
-    end
-  end
+  defp status_classes(:active), do: "border border-success/40 bg-success/20 text-success"
+  defp status_classes(:inactive), do: "border border-primary/40 bg-primary/20 text-primary"
+  defp status_classes(:finished), do: "border border-error/40 bg-error/20 text-error"
+  defp status_classes(_), do: "border border-base-300/40 bg-base-200/40 text-base-content"
 
   defp tournament_game_name(%{game: %Ecto.Association.NotLoaded{}}), do: nil
   defp tournament_game_name(%{game: %{name: name}}) when is_binary(name), do: name
   defp tournament_game_name(_), do: nil
 
   @spec render_status(atom()) :: String.t()
-  def render_status(status) do
-    case status do
-      :inactive -> "Open"
-      :active -> "In progress"
-      :finished -> "Finished"
-    end
-  end
+  def render_status(:inactive), do: "Open"
+  def render_status(:active), do: "In progress"
+  def render_status(:finished), do: "Finished"
+  def render_status(status), do: status
 
   @spec render_round_status(atom()) :: String.t()
-  def render_round_status(status) do
-    case status do
-      :inactive -> "Pairing players"
-      :active -> "In progress"
-      :finished -> "Finished"
-      _ -> "??"
-    end
-  end
+  def render_round_status(:inactive), do: "Pairing players"
+  def render_round_status(:active), do: "In progress"
+  def render_round_status(:finished), do: "Finished"
+  def render_round_status(status), do: status
 
   @doc """
   Renders tournament format as display text.
   """
   @spec render_format(atom() | nil) :: String.t()
-  def render_format(format) do
-    case format do
-      :edh -> "Commander (EDH)"
-      :standard -> "Standard"
-      nil -> ""
-    end
-  end
+  def render_format(:edh), do: "Commander (EDH)"
+  def render_format(:standard), do: "Standard"
+  def render_format(format), do: format
 
   @doc """
   Renders tournament subformat as display text.
   """
   @spec render_subformat(atom() | nil) :: String.t()
-  def render_subformat(subformat) do
-    case subformat do
-      :bubble_rounds -> "Bubble Rounds"
-      :swiss -> "Swiss Rounds"
-      :round_robin -> "Round Robin"
-      nil -> ""
-    end
-  end
+  def render_subformat(:bubble_rounds), do: "Bubble Rounds"
+  def render_subformat(:swiss), do: "Swiss Rounds"
+  def render_subformat(:round_robin), do: "Round Robin"
+  def render_subformat(format), do: format
 end
