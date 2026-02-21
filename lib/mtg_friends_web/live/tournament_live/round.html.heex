@@ -109,23 +109,6 @@
               </div>
             </div>
           </div>
-          <div
-            :if={@current_user_owner and @round_status == :inactive}
-            class="mt-5 rounded-2xl border border-success/30 bg-success/10 p-4"
-          >
-            <p class="mb-3 text-sm text-success-content">
-              This round's pods are generated and ready to start.
-            </p>
-            <.button
-              type="button"
-              phx-click="start-round"
-              phx-disable-with="Starting..."
-              variant="success"
-              class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold uppercase tracking-wide"
-            >
-              <.icon name="hero-rocket-launch-solid" class="size-4" /> Start Round
-            </.button>
-          </div>
         </div>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">

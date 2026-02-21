@@ -2,6 +2,7 @@ defmodule MtgFriendsWeb.UserConfirmationLive do
   use MtgFriendsWeb, :live_view
 
   alias MtgFriends.Accounts
+  alias MtgFriends.Analytics
 
   def render(%{live_action: :edit} = assigns) do
     ~H"""
@@ -34,7 +35,9 @@ defmodule MtgFriendsWeb.UserConfirmationLive do
   # leaked token giving the user access to the account.
   def handle_event("confirm_account", %{"user" => %{"token" => token}}, socket) do
     case Accounts.confirm_user(token) do
-      {:ok, _} ->
+      {:ok, user} ->
+        Analytics.capture_user_signed_up(user.id)
+
         {:noreply,
          socket
          |> put_flash(:success, "User confirmed successfully.")

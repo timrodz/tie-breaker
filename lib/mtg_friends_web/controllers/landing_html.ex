@@ -211,12 +211,6 @@ defmodule MtgFriendsWeb.LandingHTML do
         icon: "hero-users-solid",
         footer_text: "Custom Pairing Logic"
       }
-      # %{
-      #   title: "Open Source",
-      #   description: "Built for reliability. Open sourced, Tie Breaker gives to the community a product they can fully own, completely free.",
-      #   icon: "hero-code-bracket-square-solid",
-      #   href: "https://github.com/timrodz/mtg-friends"
-      # }
     ]
   end
 end
