@@ -270,8 +270,8 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
       # 5. Verify the updated points appear correctly on the new page
       {:ok, round_view, _html} = live(conn, ~p"/tournaments/#{tournament.id}/rounds/1")
 
-      assert render(round_view) =~ "3 pts"
-      assert render(round_view) =~ "1 pts"
+      assert has_element?(round_view, "p", "3 pts")
+      assert has_element?(round_view, "p", "1 pts")
     end
   end
 end
