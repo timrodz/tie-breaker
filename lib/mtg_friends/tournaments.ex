@@ -22,6 +22,7 @@ defmodule MtgFriends.Tournaments do
   require Logger
 
   alias MtgFriends.Tournaments.Tournament
+  alias MtgFriends.Analytics
   alias MtgFriends.Rounds.Round
   alias MtgFriends.Participants.Participant
 
@@ -84,7 +85,7 @@ defmodule MtgFriends.Tournaments do
   end
 
   @spec get_tournament_count() :: integer()
-  def get_tournament_count() do
+  def get_tournament_count do
     Repo.aggregate(Tournament, :count, :id)
   end
 
@@ -144,7 +145,7 @@ defmodule MtgFriends.Tournaments do
   defp filter_by_status(query, _params), do: query
 
   @spec list_tournaments_admin() :: [Tournament.t()]
-  def list_tournaments_admin() do
+  def list_tournaments_admin do
     Repo.all(Tournament, order_by: [asc: :id])
     |> Repo.preload([:participants, :rounds])
   end
@@ -231,22 +232,38 @@ defmodule MtgFriends.Tournaments do
 
   @spec create_tournament(map()) :: {:ok, Tournament.t()} | {:error, Ecto.Changeset.t()}
   def create_tournament(attrs \\ %{}) do
-    %Tournament{}
-    |> Tournament.changeset(
-      with description_raw <- Map.get(attrs, "description_raw"),
-           false <- is_nil(description_raw),
-           true <- String.length(description_raw) > 0 do
-        attrs
-        |> Map.put(
-          "description_html",
-          validate_description(description_raw)
-        )
-      else
-        _ ->
+    result =
+      %Tournament{}
+      |> Tournament.changeset(
+        with description_raw <- Map.get(attrs, "description_raw"),
+             false <- is_nil(description_raw),
+             true <- String.length(description_raw) > 0 do
           attrs
-      end
-    )
-    |> Repo.insert()
+          |> Map.put(
+            "description_html",
+            validate_description(description_raw)
+          )
+        else
+          _ ->
+            attrs
+        end
+      )
+      |> Repo.insert()
+
+    case result do
+      {:ok, tournament} ->
+        Analytics.capture_tournament_created(
+          tournament.id,
+          tournament.user_id,
+          tournament.format,
+          tournament.subformat
+        )
+
+        {:ok, tournament}
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @doc """
@@ -296,7 +313,19 @@ defmodule MtgFriends.Tournaments do
 
   @spec delete_tournament(Tournament.t()) :: {:ok, Tournament.t()} | {:error, Ecto.Changeset.t()}
   def delete_tournament(%Tournament{} = tournament) do
-    Repo.delete(tournament)
+    case Repo.delete(tournament) do
+      {:ok, deleted_tournament} ->
+        Analytics.capture_tournament_deleted(
+          deleted_tournament.id,
+          deleted_tournament.user_id,
+          deleted_tournament.status
+        )
+
+        {:ok, deleted_tournament}
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @doc """
@@ -316,71 +345,79 @@ defmodule MtgFriends.Tournaments do
 
   @spec validate_description(String.t()) :: String.t()
   defp validate_description(description_raw) do
-    try do
-      HTTPoison.start()
-      expected_fields = ~w(image_uris name)
+    HTTPoison.start()
+    expected_fields = ~w(image_uris name)
 
-      # Grabs all text inside double brackets i.e. [[Lightning greaves]]
-      cards_to_search =
-        Regex.scan(~r/\[\[(.*?)\]\]/, description_raw)
-        |> Enum.map(&hd/1)
-        |> then(
-          &for(
-            card_raw <- &1,
-            do:
-              with card_clean <-
-                     card_raw
-                     |> String.replace("[[", "")
-                     |> String.replace("]]", "")
-                     |> URI.encode(),
-                   uri <-
-                     "https://api.scryfall.com/cards/named?fuzzy=#{card_clean}",
-                   {:ok, response} <-
-                     HTTPoison.get(
-                       uri,
-                       [
-                         {"User-Agent", "tie-breaker/#{Application.spec(:mtg_friends, :vsn)}"},
-                         {"Accept", "application/json"}
-                       ]
-                     ) do
-                body =
-                  response.body
-                  |> Poison.decode!()
-                  |> Map.take(expected_fields)
+    # Grabs all text inside double brackets i.e. [[Lightning greaves]]
+    cards_to_search =
+      Regex.scan(~r/\[\[(.*?)\]\]/, description_raw)
+      |> Enum.map(&hd/1)
+      |> then(
+        &for(
+          card_raw <- &1,
+          do:
+            with card_clean <-
+                   card_raw
+                   |> String.replace("[[", "")
+                   |> String.replace("]]", "")
+                   |> URI.encode(),
+                 uri <-
+                   "https://api.scryfall.com/cards/named?fuzzy=#{card_clean}",
+                 {:ok, response} <-
+                   HTTPoison.get(
+                     uri,
+                     [
+                       {"User-Agent", "tie-breaker/#{Application.spec(:mtg_friends, :vsn)}"},
+                       {"Accept", "application/json"}
+                     ]
+                   ) do
+              body =
+                response.body
+                |> Poison.decode!()
+                |> Map.take(expected_fields)
 
-                image_uris = Map.get(body, "image_uris")
+              image_uris = Map.get(body, "image_uris")
 
-                case image_uris do
-                  nil ->
-                    nil
+              case image_uris do
+                nil ->
+                  nil
 
-                  _ ->
-                    img_large = Map.get(image_uris, "large")
-                    name = Map.get(body, "name")
-                    %CardMetadata{image_uri: img_large, name: name, og_name: card_raw}
-                end
-              else
-                _ -> nil
+                _ ->
+                  img_large = Map.get(image_uris, "large")
+                  name = Map.get(body, "name")
+                  %CardMetadata{image_uri: img_large, name: name, og_name: card_raw}
               end
-          )
+            else
+              _ -> nil
+            end
         )
-        |> Enum.reject(&is_nil/1)
-
-      cards_names_to_search = for card <- cards_to_search, do: card.og_name
-
-      String.replace(
-        String.replace(description_raw, "\n", "</br>"),
-        cards_names_to_search,
-        fn og_name ->
-          metadata = Enum.find(cards_to_search, fn card -> card.og_name == og_name end)
-
-          "<a class=\"underline\" target=\"_blank\" href=\"#{metadata.image_uri}\">#{metadata.name}</a>"
-        end
       )
-    rescue
-      e ->
-        Logger.warning("Failed to validate description with card metadata: #{inspect(e)}")
-        String.replace(description_raw, "\n", "</br>")
-    end
+      |> Enum.reject(&is_nil/1)
+
+    cards_names_to_search = for card <- cards_to_search, do: card.og_name
+
+    String.replace(
+      String.replace(description_raw, "\n", "</br>"),
+      cards_names_to_search,
+      fn og_name ->
+        metadata = Enum.find(cards_to_search, fn card -> card.og_name == og_name end)
+
+        "<a class=\"underline\" target=\"_blank\" href=\"#{metadata.image_uri}\">#{metadata.name}</a>"
+      end
+    )
+  catch
+    e ->
+      Logger.warning("Failed to validate description with card metadata: #{inspect(e)}")
+      String.replace(description_raw, "\n", "</br>")
+  end
+
+  def rounds_remaining(tournament) do
+    max(tournament.round_count - length(tournament.rounds), 0)
+  end
+
+  def can_start_new_round?(tournament) do
+    tournament.status != :finished and
+      rounds_remaining(tournament) > 0 and
+      Enum.all?(tournament.rounds, fn round -> round.status != :active end)
   end
 end

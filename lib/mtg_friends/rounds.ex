@@ -4,6 +4,7 @@ defmodule MtgFriends.Rounds do
   """
 
   import Ecto.Query, warn: false
+  alias MtgFriends.Analytics
   alias MtgFriends.Pairings.Pairing
   alias MtgFriends.Repo
 
@@ -184,9 +185,16 @@ defmodule MtgFriends.Rounds do
 
   @spec update_round(Round.t(), map()) :: {:ok, Round.t()} | {:error, Ecto.Changeset.t()}
   def update_round(%Round{} = round, attrs) do
-    round
-    |> Round.changeset(attrs)
-    |> Repo.update()
+    case round
+         |> Round.changeset(attrs)
+         |> Repo.update() do
+      {:ok, updated_round} ->
+        maybe_capture_round_finished(round, attrs, updated_round)
+        {:ok, updated_round}
+
+      {:error, _} = error ->
+        error
+    end
   end
 
   @doc """
@@ -299,4 +307,25 @@ defmodule MtgFriends.Rounds do
     tournament.participants
     |> Enum.max_by(&{&1.points, &1.win_rate})
   end
+
+  defp maybe_capture_round_finished(
+         %Round{status: previous_status},
+         attrs,
+         %Round{} = updated_round
+       ) do
+    with :finished <- normalize_status(Map.get(attrs, :status) || Map.get(attrs, "status")),
+         true <- previous_status != :finished do
+      Analytics.capture_round_finished(
+        updated_round.tournament_id,
+        updated_round.id,
+        updated_round.number
+      )
+    end
+
+    :ok
+  end
+
+  defp normalize_status(:finished), do: :finished
+  defp normalize_status("finished"), do: :finished
+  defp normalize_status(_), do: :other
 end

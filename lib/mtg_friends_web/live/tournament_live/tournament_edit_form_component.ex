@@ -232,7 +232,7 @@ defmodule MtgFriendsWeb.TournamentLive.TournamentEditFormComponent do
     end
   end
 
-  defp get_game_codes() do
+  defp get_game_codes do
     [
       {"Magic: The Gathering", :mtg},
       {"Yu-Gi-Oh!", :yugioh},

@@ -38,7 +38,7 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       {:ok, socket} ->
         with {pairing_number, ""} when pairing_number > 0 <- Integer.parse(pairing_number_str),
              {:ok, pairing_id} <-
-               pairing_id_from_number(tournament_id, round_number, pairing_number) do
+               get_pairing_id_from_number(tournament_id, round_number, pairing_number) do
           socket
           |> assign(:selected_pairing_id, pairing_id)
           |> generate_socket(tournament_id, round_number, :edit)
@@ -67,8 +67,6 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
         {pairing.id,
          to_form(%{
            "pairing_id" => pairing.id,
-           "table_number" => pairing.id,
-           "winner_id" => pairing.winner_id,
            "participants" =>
              Enum.map(
                Enum.sort_by(pairing.pairing_participants, fn pp -> pp.points end, :desc),
@@ -85,12 +83,10 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       |> Map.new()
 
     round_finish_time =
-      cond do
-        not is_nil(round.started_at) and round.status != :finished ->
-          NaiveDateTime.add(round.started_at, round.tournament.round_length_minutes, :minute)
-
-        true ->
-          nil
+      if not is_nil(round.started_at) and round.status != :finished do
+        NaiveDateTime.add(round.started_at, round.tournament.round_length_minutes, :minute)
+      else
+        nil
       end
 
     with timer_reference <- Map.get(socket.assigns, :timer_reference),
@@ -115,22 +111,14 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
       round_finish_time: round_finish_time,
       round_countdown_timer: get_countdown_timer(round_finish_time),
       tournament_id: round.tournament.id,
-      tournament_name: round.tournament.name,
+      tournament_name: tournament_name,
       tournament_rounds: round.tournament.rounds,
       tournament_status: round.tournament.status,
-      rounds_remaining: rounds_remaining(round.tournament),
-      can_start_new_round?: can_start_new_round?(round.tournament),
+      rounds_remaining: Tournaments.rounds_remaining(round.tournament),
+      can_start_new_round?: Tournaments.can_start_new_round?(round.tournament),
       participants: round.tournament.participants,
       pairings: round.pairings,
-      page_title:
-        case action do
-          :index ->
-            "#{tournament_name} / Round #{round.number + 1}"
-
-          :edit ->
-            "#{tournament_name} / Round #{round.number + 1} / Edit Pairing"
-        end,
-      # num_pairings logic was just for display, now we have explicit pairings
+      page_title: page_title(action, tournament_name, round.number + 1),
       forms: forms
     )
     |> UserAuth.assign_current_user_owner(
@@ -139,62 +127,18 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
     )
   end
 
+  defp page_title(:index, tournament_name, round_number),
+    do: "#{tournament_name} / Round #{round_number}"
+
+  defp page_title(:edit, tournament_name, round_number),
+    do: "#{tournament_name} / Round #{round_number} / Edit Pairing"
+
   @impl true
   def handle_info(:tick, socket) do
     {:noreply,
      assign(socket,
        round_countdown_timer: get_countdown_timer(socket.assigns.round_finish_time)
      )}
-  end
-
-  @impl true
-  def handle_event("start-round", _, socket) do
-    redirect_to =
-      ~p"/tournaments/#{socket.assigns.tournament_id}/rounds/#{socket.assigns.round_number + 1}"
-
-    case UserAuth.ensure_can_manage_tournament_id(
-           socket,
-           socket.assigns.tournament_id,
-           redirect_to
-         ) do
-      {:ok, socket} ->
-        %{round_id: round_id} = socket.assigns
-        round = Rounds.get_round!(round_id)
-        Rounds.update_round(round, %{status: :active, started_at: NaiveDateTime.utc_now()})
-
-        {:noreply,
-         socket
-         |> put_flash(:info, "This round has now begun!")
-         |> reload_page}
-
-      {:error, socket} ->
-        {:noreply, socket}
-    end
-  end
-
-  @impl true
-  def handle_event("finish-round", _, socket) do
-    redirect_to =
-      ~p"/tournaments/#{socket.assigns.tournament_id}/rounds/#{socket.assigns.round_number + 1}"
-
-    case UserAuth.ensure_can_manage_tournament_id(
-           socket,
-           socket.assigns.tournament_id,
-           redirect_to
-         ) do
-      {:ok, socket} ->
-        %{round_id: round_id} = socket.assigns
-        round = Rounds.get_round!(round_id)
-        Rounds.update_round(round, %{status: :finished})
-
-        {:noreply,
-         socket
-         |> put_flash(:info, "This round has now begun!")
-         |> reload_page}
-
-      {:error, socket} ->
-        {:noreply, socket}
-    end
   end
 
   @impl true
@@ -217,7 +161,7 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
   end
 
   defp handle_create_round(socket, tournament) do
-    if can_start_new_round?(tournament) do
+    if Tournaments.can_start_new_round?(tournament) do
       start_round_and_navigate(socket, tournament)
     else
       {:noreply,
@@ -258,27 +202,7 @@ defmodule MtgFriendsWeb.TournamentLive.Round do
     end
   end
 
-  defp reload_page(socket) do
-    %{tournament_id: tournament_id, round_number: round_number} = socket.assigns
-
-    socket
-    |> push_patch(
-      to: ~p"/tournaments/#{tournament_id}/rounds/#{round_number + 1}",
-      replace: true
-    )
-  end
-
-  defp rounds_remaining(tournament) do
-    max(tournament.round_count - length(tournament.rounds), 0)
-  end
-
-  defp can_start_new_round?(tournament) do
-    tournament.status != :finished and
-      rounds_remaining(tournament) > 0 and
-      Enum.all?(tournament.rounds, fn round -> round.status != :active end)
-  end
-
-  defp pairing_id_from_number(tournament_id, round_number, pairing_number) do
+  defp get_pairing_id_from_number(tournament_id, round_number, pairing_number) do
     round = Rounds.get_round_from_round_number_str!(tournament_id, round_number)
 
     case Enum.at(round.pairings, pairing_number - 1) do
