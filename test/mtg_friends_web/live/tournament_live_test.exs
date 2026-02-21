@@ -222,5 +222,56 @@ defmodule MtgFriendsWeb.TournamentLiveTest do
 
       assert to == "/tournaments/#{tournament.id}/rounds/1"
     end
+
+    test "owner can access round edit pairing route, update points, and patch back" do
+      owner = user_fixture()
+      tournament = tournament_fixture(%{user: owner, round_count: 2})
+
+      for idx <- 1..4 do
+        participant_fixture(%{tournament: tournament, name: "Player #{idx}"})
+      end
+
+      tournament = Tournaments.get_tournament!(tournament.id)
+      {:ok, round} = Rounds.start_round(tournament)
+
+      round = Rounds.get_round!(round.id, true)
+      pairing = List.first(round.pairings)
+      [p1, p2, p3, p4] = pairing.pairing_participants |> Enum.sort_by(& &1.id)
+
+      conn = log_in_user(build_conn(), owner)
+
+      # 1. Access the main round page
+      {:ok, view, _html} = live(conn, ~p"/tournaments/#{tournament.id}/rounds/1")
+
+      assert has_element?(view, "a", ~r/Assign Pod Results/i)
+
+      # 2. Open the edit modal
+      {:ok, edit_view, _html} =
+        live(conn, ~p"/tournaments/#{tournament.id}/rounds/1/pairing/1/edit")
+
+      assert has_element?(edit_view, "#edit-pairing-#{pairing.id}")
+
+      # 3. Submit changes to the form internally
+      form_data = %{
+        "input-points-participant-#{p1.participant_id}" => "3",
+        "input-points-participant-#{p2.participant_id}" => "1",
+        "input-points-participant-#{p3.participant_id}" => "0",
+        "input-points-participant-#{p4.participant_id}" => "0",
+        "pairing-number" => "#{pairing.id}"
+      }
+
+      assert edit_view
+             |> form("#edit-pairing-#{pairing.id}", form_data)
+             |> render_submit()
+
+      # 4. Verify redirect navigation back to the round index
+      assert_redirect(edit_view, ~p"/tournaments/#{tournament.id}/rounds/1")
+
+      # 5. Verify the updated points appear correctly on the new page
+      {:ok, round_view, _html} = live(conn, ~p"/tournaments/#{tournament.id}/rounds/1")
+
+      assert render(round_view) =~ "3 pts"
+      assert render(round_view) =~ "1 pts"
+    end
   end
 end
