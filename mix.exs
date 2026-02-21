@@ -14,7 +14,7 @@ defmodule MtgFriends.MixProject do
       listeners: [Phoenix.CodeReloader],
       dialyzer: [plt_add_apps: [:mix]],
       test_coverage: [
-        summary: [threshold: 79.30],
+        summary: [threshold: 81.25],
         ignore_modules: [
           MtgFriendsWeb.LandingHTML,
           MtgFriendsWeb.ErrorHTML,
