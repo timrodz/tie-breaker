@@ -27,6 +27,7 @@ defmodule MtgFriendsWeb.Router do
     pipe_through :browser
 
     get "/", LandingController, :index
+    get "/faq", FaqController, :index
 
     live_session :tournaments_current_user,
       on_mount: [{MtgFriendsWeb.UserAuth, :mount_current_user}] do
