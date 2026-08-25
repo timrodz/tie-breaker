@@ -59,6 +59,10 @@ defmodule MtgFriendsWeb.LandingHTML do
         </section>
 
         <section class="mx-auto mt-24 max-w-7xl px-6">
+          <h2 class="text-center text-5xl font-bold text-base-content">Hello World</h2>
+        </section>
+
+        <section class="mx-auto mt-24 max-w-7xl px-6">
           <div class="mb-6 flex items-end justify-between gap-4">
             <div>
               <h2 class="text-5xl font-bold text-base-content">Latest tournaments</h2>
