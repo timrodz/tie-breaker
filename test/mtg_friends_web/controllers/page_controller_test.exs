@@ -4,5 +4,6 @@ defmodule MtgFriendsWeb.LandingControllerTest do
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
     assert html_response(conn, 200) =~ "PRO-LEVEL"
+    assert html_response(conn, 200) =~ "Create Tournament"
   end
 end
