@@ -117,6 +117,21 @@ defmodule MtgFriendsWeb.LandingHTML do
             </article>
           </div>
         </section>
+
+        <%!-- CTA Banner Placeholder — iterate on design and wiring later --%>
+        <section id="cta-banner" class="mx-auto mt-28 max-w-7xl px-6">
+          <div class="rounded-xl border border-base-300 bg-base-200 p-8">
+            <h2 class="text-4xl font-bold text-base-content">Ready to get started?</h2>
+            <p class="mt-2 text-2xl text-base-content/70">
+              Start your tournament today — this call to action is a placeholder for future iteration.
+            </p>
+            <div class="mt-6">
+              <.button variant="primary" class="text-xl font-bold uppercase tracking-wide">
+                Create Tournament
+              </.button>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer class="border-t border-base-300 bg-base-300 pt-6 pb-8">
