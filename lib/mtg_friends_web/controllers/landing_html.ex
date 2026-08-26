@@ -127,19 +127,23 @@ defmodule MtgFriendsWeb.LandingHTML do
               <span class="font-bold tracking-tighter text-base-content/80">TIE BREAKER</span>
             </div>
             <div class="flex gap-8 text-sm font-bold uppercase tracking-widest text-base-content/60">
-              <.link
-                href="https://github.com/timrodz/mtg-friends"
-                target="_blank"
-                class="hover:text-base-content"
-              >
-                Open Source
-              </.link>
-              <.link href="mailto:juan@timrodz.dev" class="hover:text-base-content">Contact</.link>
+              <span class="text-sm font-bold uppercase tracking-widest text-base-content/60 hover:text-base-content">
+                Link 1
+              </span>
+              <span class="text-sm font-bold uppercase tracking-widest text-base-content/60 hover:text-base-content">
+                Link 2
+              </span>
+              <span class="text-sm font-bold uppercase tracking-widest text-base-content/60 hover:text-base-content">
+                Link 3
+              </span>
             </div>
             <div class="text-center text-xs font-medium text-base-content/50 md:text-left">
               &copy; {DateTime.utc_now().year} Tie Breaker Tournament Systems. Pro-level tools, free forever. Not affiliated with any specific TCG brand.
             </div>
           </div>
+          <p class="mt-4 text-center text-xs text-base-content/40">
+            Footer placeholder — coming soon
+          </p>
         </div>
       </footer>
     </div>
