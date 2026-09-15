@@ -19,3 +19,13 @@ Connect via `psql`
 ```shell
 fly postgres connect -a <database-name>
 ```
+
+## Rendering Fixture Alpha
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vehicula sapien at nisl fermentum.
+
+- Nulla facilisi fermentum
+- Cras vehicula mollis auctor
+- Donec aliquet sagittis
+
+A placeholder phrase with **bold** and *italic* emphasis for markdown preview.
