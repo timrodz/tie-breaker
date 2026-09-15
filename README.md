@@ -29,3 +29,19 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vehicula sapien
 - Donec aliquet sagittis
 
 A placeholder phrase with **bold** and *italic* emphasis for markdown preview.
+
+## Rendering Fixture Beta
+
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.
+
+1. Totam rem aperiam eaque
+2. Quae ab illo inventore
+3. Veritatis et quasi architecto
+
+## Rendering Fixture Gamma
+
+Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, *consectetur* adipisci velit.
+
+- Numquam eius modi tempora
+- Incidunt ut labore et dolore
+- Magnam aliquam quaerat **voluptatem**
